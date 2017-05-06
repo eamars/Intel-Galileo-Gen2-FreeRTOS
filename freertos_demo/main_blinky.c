@@ -219,7 +219,7 @@ const uint32_t ulExpectedValue = 100UL;
 	( void ) pvParameters;
 
 	/* Initial cursor position to skip a line) */
-	g_printf_rcc( 5, 2, DEFAULT_SCREEN_COLOR, "LED on the Galileo board should be blinking." );
+	g_printf_rcc( 5, 2, DEFAULT_SCREEN_COLOR, "FreeRTOS Task prvQueueReceivedTask initialized" );
 
 	for( ;; )
 	{

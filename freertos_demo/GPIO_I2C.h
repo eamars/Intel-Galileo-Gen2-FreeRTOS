@@ -239,13 +239,13 @@ GALILEO_GEN2_LEGACY_GPIO_INITIALIZER ,    \
 #define B_IOH_I2C_GPIO_MEMBAR_ADDR_MASK    0xFFFFF000    // [31:12].
 #define I2C_REG_CLR_START_DET              0x64          // Clear START DET Interrupt Register
 #define I2C_REG_CLR_STOP_DET               0x60          // Clear STOP DET Interrupt Register
-#define B_I2C_REG_CLR_START_DET            (BIT0)        // Clear START DET Interrupt Register
-#define B_I2C_REG_CLR_STOP_DET             (BIT0)        // Clear STOP DET Interrupt Register
-#define B_I2C_REG_CON_10BITADD_MASTER      (BIT4)        // 7-bit addressing (0) or 10-bit addressing (1)
-#define B_I2C_REG_CON_SPEED                (BIT2+BIT1)   // standard mode (01) or fast mode (10)
+#define B_I2C_REG_CLR_START_DET            (BIT(0))        // Clear START DET Interrupt Register
+#define B_I2C_REG_CLR_STOP_DET             (BIT(0))        // Clear STOP DET Interrupt Register
+#define B_I2C_REG_CON_10BITADD_MASTER      (BIT(4))        // 7-bit addressing (0) or 10-bit addressing (1)
+#define B_I2C_REG_CON_SPEED                (BIT(2)+BIT(1))   // standard mode (01) or fast mode (10)
 #define I2C_REG_CON                         0x00         // Control Register
 #define I2C_REG_ENABLE                      0x6C         // Enable Register
-#define B_I2C_REG_ENABLE                   (BIT0)        // Enable (1) or disable (0) I2C Controller
+#define B_I2C_REG_ENABLE                   (BIT(0))        // Enable (1) or disable (0) I2C Controller
 #define I2C_REG_ENABLE_STATUS               0x9C         // Enable Status Register
 #define I2C_REG_CLR_INT                     0x40         // Clear Combined and Individual Interrupt Register
 #define MAX_T_POLL_COUNT         			100
@@ -255,19 +255,19 @@ GALILEO_GEN2_LEGACY_GPIO_INITIALIZER ,    \
 #define I2C_REG_CLR_TX_ABRT                 0x54         // Clear TX ABRT Interrupt Register
 #define I2C_FIFO_SIZE                      16
 #define I2C_REG_TAR                        0x04          // Master Target Address Register
-#define B_I2C_REG_TAR                      (BIT9+BIT8+BIT7+BIT6+BIT5+BIT4+BIT3+BIT2+BIT1+BIT0) // Master Target Address bits
+#define B_I2C_REG_TAR                      (BIT(9)+BIT(8)+BIT(7)+BIT(6)+BIT(5)+BIT(4)+BIT(3)+BIT(2)+BIT(1)+BIT(0)) // Master Target Address bits
 #define I2C_REG_DATA_CMD                   0x10          // Data Buffer and Command Register
-#define B_I2C_REG_DATA_CMD_RW              (BIT8)        // Data Buffer and Command Register Read/Write bit
+#define B_I2C_REG_DATA_CMD_RW              (BIT(8))        // Data Buffer and Command Register Read/Write bit
 #define I2C_REG_RXFLR                      0x78          // Receive FIFO Level Register
-#define B_I2C_REG_DATA_CMD_STOP            (BIT9)        // Data Buffer and Command Register STOP bit
+#define B_I2C_REG_DATA_CMD_STOP            (BIT(9))        // Data Buffer and Command Register STOP bit
 #define I2C_REG_RAW_INTR_STAT              0x34          // Raw Interrupt Status Register
-#define I2C_REG_RAW_INTR_STAT_RX_OVER      (BIT1)        // Raw Interrupt Status Register RX Overflow signal status.
-#define I2C_REG_RAW_INTR_STAT_RX_UNDER     (BIT0)        // Raw Interrupt Status Register RX Underflow signal status.
+#define I2C_REG_RAW_INTR_STAT_RX_OVER      (BIT(1))        // Raw Interrupt Status Register RX Overflow signal status.
+#define I2C_REG_RAW_INTR_STAT_RX_UNDER     (BIT(0))        // Raw Interrupt Status Register RX Underflow signal status.
 #define I2C_REG_CLR_RX_UNDER               0x44          // Clear RX Under Interrupt Register
 #define MAX_STOP_DET_POLL_COUNT 		   ((1000 * 1000) / TI2C_POLL)  // Extreme for expected Stop detect.
-#define I2C_REG_RAW_INTR_STAT_TX_ABRT      (BIT6)        // Raw Interrupt Status Register TX Abort status.
-#define I2C_REG_RAW_INTR_STAT_TX_OVER      (BIT3)        // Raw Interrupt Status Register TX Overflow signal status.
-#define I2C_REG_RAW_INTR_STAT_STOP_DET     (BIT9)        // Raw Interrupt Status Register STOP_DET signal status.
+#define I2C_REG_RAW_INTR_STAT_TX_ABRT      (BIT(6))        // Raw Interrupt Status Register TX Abort status.
+#define I2C_REG_RAW_INTR_STAT_TX_OVER      (BIT(3))        // Raw Interrupt Status Register TX Overflow signal status.
+#define I2C_REG_RAW_INTR_STAT_STOP_DET     (BIT(9))        // Raw Interrupt Status Register STOP_DET signal status.
 
 //---------------------------------------------------------------------
 // GPIO Prototypes

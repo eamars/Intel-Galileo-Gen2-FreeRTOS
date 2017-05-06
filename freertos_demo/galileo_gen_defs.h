@@ -39,6 +39,7 @@
  * Any required includes
  *------------------------------------------------------------------------
  */
+#include <stdbool.h>
 #include <stdarg.h>
 #include "stdint.h"
 
@@ -86,16 +87,9 @@ extern int32_t outl( int32_t, int32_t) ;
 //---------------------------------------------------------------------
 // General bit pattern definitions
 //---------------------------------------------------------------------
-#define BIT0  0x00000001U
-#define BIT1  0x00000002U
-#define BIT2  0x00000004U
-#define BIT3  0x00000008U
-#define BIT4  0x00000010U
-#define BIT5  0x00000020U
-#define BIT6  0x00000040U
-#define BIT7  0x00000080U
-#define BIT8  0x00000100U
-#define BIT9  0x00000200U
+#ifndef BIT
+    #define BIT(x) (1U << (x))
+#endif
 
 //---------------------------------------------------------------------
 // MMIO support definitions

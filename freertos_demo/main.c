@@ -87,6 +87,7 @@
 
 /* Standard includes. */
 #include <stdlib.h>
+#include <stdio.h>
 
 /* Scheduler include files. */
 #include "FreeRTOS.h"
@@ -159,6 +160,7 @@ static void prvClearAssertionLine( void );
 instructions. */
 int main( void )
 {
+    printf("Helloworld\r\n");
 	/* Optionally wait for a debugger to connect. */
 	prvLoopToWaitForDebugConnection();
 
@@ -380,12 +382,12 @@ static void prvLoopToWaitForDebugConnection( void )
 
 void CRT_Init( void )
 {
-extern uint32_t __bss_start[];
-extern uint32_t __bss_end[];
-extern uint32_t __data_vma[];
-extern uint32_t __data_lma[];
-extern uint32_t __data_start[];
-extern uint32_t __data_end[];
+extern uint32_t *__bss_start;
+extern uint32_t *__bss_end;
+extern uint32_t *__data_vma;
+extern uint32_t *__data_lma;
+extern uint32_t *__data_start;
+extern uint32_t *__data_end;
 uint32_t x = 255;
 size_t xSize;
 

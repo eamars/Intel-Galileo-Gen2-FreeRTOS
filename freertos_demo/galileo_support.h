@@ -67,7 +67,7 @@ struct __attribute__ ((__packed__)) sd
 	unsigned char	sd_hibase;
 };
 
-void setsegs();
+void setsegs(void);
 
 //---------------------------------------------------------------------
 // Debug serial port display update definitions
@@ -143,26 +143,26 @@ uint32_t ulBlinkLED(void); /* Blink the LED and return the LED status. */
 #define R_UART_BAUD_LOW                 R_UART_BAUD_THR
 #define R_UART_BAUD_HIGH                R_UART_IER
 #define R_UART_FCR                      0x08
-#define B_UARY_FCR_TRFIFIE              BIT0
-#define B_UARY_FCR_RESETRF              BIT1
-#define B_UARY_FCR_RESETTF              BIT2
+#define B_UARY_FCR_TRFIFIE              BIT(0)
+#define B_UARY_FCR_RESETRF              BIT(1)
+#define B_UARY_FCR_RESETTF              BIT(2)
 #define R_UART_LCR                      0x0C
-#define B_UARY_LCR_DLAB                 BIT7
+#define B_UARY_LCR_DLAB                 BIT(7)
 #define R_UART_MCR                      0x10
 #define R_UART_LSR                      0x14
-#define B_UART_LSR_RXRDY                BIT0
-#define B_UART_LSR_OE                   BIT1
-#define B_UART_LSR_PE                   BIT2
-#define B_UART_LSR_FE                   BIT3
-#define B_UART_LSR_BI                   BIT4
-#define B_UART_LSR_TXRDY                BIT5
-#define B_UART_LSR_TEMT                 BIT6
+#define B_UART_LSR_RXRDY                BIT(0)
+#define B_UART_LSR_OE                   BIT(1)
+#define B_UART_LSR_PE                   BIT(2)
+#define B_UART_LSR_FE                   BIT(3)
+#define B_UART_LSR_BI                   BIT(4)
+#define B_UART_LSR_TXRDY                BIT(5)
+#define B_UART_LSR_TEMT                 BIT(6)
 #define R_UART_MSR                      0x18
 #define R_UART_SCR                      0x1C
 
 void vInitializeGalileoSerialPort(uint32_t portnumber);
 void vGalileoPrintc(char c);
-uint8_t ucGalileoGetchar();
+uint8_t ucGalileoGetchar(void);
 void vGalileoPuts(const char *string);
 
 #ifdef __cplusplus

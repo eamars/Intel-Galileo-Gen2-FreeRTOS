@@ -487,7 +487,7 @@ static uint32_t bGalileoGPIOInitialized = FALSE;
 		Data &= ~B_I2C_REG_CON_SPEED;
 
 		// Default to slow mode
-		Data |= BIT1;
+		Data |= BIT(1);
 		*((volatile uint32_t *) (uintn_t)(Addr)) = Data;
 		Data = *((volatile uint32_t *) (uintn_t)(Addr));
 		return Status;

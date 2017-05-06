@@ -491,8 +491,8 @@ void show_kernel_parameters( unsigned long magic, unsigned long addr )
 		B_UARY_FCR_RESETRF | B_UARY_FCR_RESETTF | 0x30));
 
 	input_data = mem_read(base, R_UART_MCR, 1);
-	input_data |= BIT1;
-	input_data &= ~BIT5;
+	input_data |= BIT(1);
+	input_data &= ~BIT(5);
 	mem_write(base, R_UART_MCR, 1, input_data);
 
 	lcr = mem_read(base, R_UART_LCR, 1);

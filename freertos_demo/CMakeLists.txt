@@ -1,7 +1,7 @@
 MESSAGE("ENTER ${CMAKE_CURRENT_SOURCE_DIR}")
 
 # override linker flags
-SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -lgcc -nostdlib -L${CMAKE_CURRENT_SOURCE_DIR} -Xlinker -T${CMAKE_CURRENT_SOURCE_DIR}/elf_ia32_efi.lds -Xlinker --gc-sections -Xlinker -Map=RTOSDemo.map")
+SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -lgcc -nostdlib -L${CMAKE_CURRENT_SOURCE_DIR} -Xlinker -T${CMAKE_CURRENT_SOURCE_DIR}/elf_ia32_efi.lds -Xlinker --gc-sections -Xlinker -Map=symbols.map")
 
 # override executable
 SET(EXECUTABLE "FREERTOS_DEMO")

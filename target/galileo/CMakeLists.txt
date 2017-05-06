@@ -6,7 +6,7 @@ GET_FILENAME_COMPONENT(LIB_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
 # define C flags
 SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall -Wstrict-prototypes -W -g3 -Wno-unused -Wno-unused-parameter -c -fmessage-length=0 -march=pentium -Wno-ignored-qualifiers -mno-ms-bitfields -ffunction-sections -ffreestanding")
-SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}-Wall -W -g3 -Wno-unused -Wno-unused-parameter -c -fmessage-length=0 -march=pentium -Wno-ignored-qualifiers -mno-ms-bitfields -ffunction-sections  -ffreestanding")
+SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -W -g3 -Wno-unused -Wno-unused-parameter -c -fmessage-length=0 -march=pentium -Wno-ignored-qualifiers -mno-ms-bitfields -ffunction-sections  -ffreestanding")
 SET(CMAKE_ASM_FLAGS_DEBUG "${CMAKE_ASM_FLAGS_DEBUG} -Wa,--gdwarf2 -Wa,-march=pentium -c")
 
 # DEBUG LD FLAGS
@@ -22,6 +22,7 @@ ADD_SUBDIRECTORY(freertoslib)
 # build sam4s library
 ADD_LIBRARY(${LIB_NAME}
         "startup.S"
+        "galileo.c"
 )
 
 ADD_DEPENDENCIES(${LIB_NAME}

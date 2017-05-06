@@ -41,7 +41,7 @@
  */
 #include <stdbool.h>
 #include <stdarg.h>
-#include "stdint.h"
+#include <stdint.h>
 
 //---------------------------------------------------------------------
 // Printf prototype
@@ -96,111 +96,127 @@ extern int32_t outl( int32_t, int32_t) ;
 //---------------------------------------------------------------------
 #define EC_BASE			0xE0000000	/* Base of MMConfig space */
 #define MMCONFIG_BASE	EC_BASE
-#define MMIO_PCI_ADDRESS(bus,dev,fn,reg) ( \
-        (EC_BASE) + \
-		((bus) << 20) + \
-		((dev) << 15) + \
-		((fn)  << 12) + \
-		(reg))
+
+static inline uint32_t MMIO_PCI_ADDRESS(uint32_t bus, uint32_t dev, uint32_t fn, uint32_t reg)
+{
+    return (EC_BASE) +
+            (bus << 20) +
+            (dev << 15) +
+            (fn << 12) +
+            (reg);
+}
 
 //---------------------------------------------------------------------
 // MMIO read/write/set/clear/modify macros
 //---------------------------------------------------------------------
-#define mem_read(base, offset, size) ({ \
-	volatile uint32_t a = (base) + (offset); \
-	volatile uint64_t v; \
-    switch (size) { \
-    case 1: \
-        v = (uint8_t)(*((uint8_t *)a)); \
-        break; \
-    case 2: \
-        v = (uint16_t)(*((uint16_t *)a)); \
-        break; \
-    case 4: \
-        v = (uint32_t)(*((uint32_t *)a)); \
-        break; \
-    case 8: \
-        v = (uint64_t)(*((uint64_t *)a)); \
-        break; \
-    default: \
-        halt(); \
-    } \
-    v; \
-})
+static inline uint64_t mem_read(uint32_t base, uint32_t offset, uint32_t size)
+{
+    volatile uint32_t addr = base + offset;
+    volatile uint64_t value;
+
+    switch(size)
+    {
+        case 1:
+            value = (uint8_t)(*((uint8_t *)addr));
+            break;
+        case 2:
+            value = (uint16_t)(*((uint16_t *)addr));
+            break;
+        case 4:
+            value = (uint32_t)(*((uint32_t *)addr));
+            break;
+        case 8:
+            value = (uint64_t)(*((uint64_t *)addr));
+            break;
+        default:
+            halt();
+    }
+
+    return value;
+}
 
 // No cache bypass necessary -- MTRRs should handle this
-#define mem_write(base, offset, size, value) { \
-	volatile uint32_t a = (base) + (offset); \
-    switch (size) { \
-    case 1: \
-        *((uint8_t *)a) = (uint8_t)(value); \
-        break; \
-    case 2: \
-        *((uint16_t *)a) = (uint16_t)(value); \
-        break; \
-    case 4: \
-        *((uint32_t *)a) = (uint32_t)(value); \
-        break; \
-    case 8: \
-        *((uint64_t *)a) = (uint64_t)(value); \
-        break; \
-    default: \
-        halt(); \
-    } \
+static inline void mem_write(uint32_t base, uint32_t offset, uint32_t size, uint32_t value)
+{
+    volatile uint32_t addr = base + offset;
+
+    switch (size)
+    {
+        case 1:
+            *((uint8_t *)addr) = (uint8_t)(value);
+            break;
+        case 2:
+            *((uint16_t *)addr) = (uint16_t)(value);
+            break;
+        case 4:
+            *((uint32_t *)addr) = (uint32_t)(value);
+            break;
+        case 8:
+            *((uint64_t *)addr) = (uint64_t)(value);
+            break;
+        default:
+            halt();
+    }
 }
 
-#define mem_set(base, offset, size, smask) { \
-	volatile uint32_t a = (base) + (offset); \
-    switch (size) { \
-    case 1: \
-        *((uint8_t *)a) = (uint8_t)((*((uint8_t *)a)) | (smask)); \
-        break; \
-    case 2: \
-        *((uint16_t *)a) = (uint16_t)((*((uint16_t *)a)) | (smask)); \
-        break; \
-    case 4: \
-        *((uint32_t *)a) = (uint32_t)((*((uint32_t *)a)) | (smask)); \
-        break; \
-    case 8: \
-        *((uint64_t *)a) = (uint64_t)((*((uint64_t *)a)) | (smask)); \
-        break; \
-    } \
+static inline void mem_set(uint32_t base, uint32_t offset, uint32_t size, uint32_t mask)
+{
+    volatile uint32_t addr = base + offset;
+
+    switch (size) {
+    case 1:
+        *((uint8_t *)addr) = (uint8_t)((*((uint8_t *)addr)) | (mask));
+        break;
+    case 2:
+        *((uint16_t *)addr) = (uint16_t)((*((uint16_t *)addr)) | (mask));
+        break;
+    case 4:
+        *((uint32_t *)addr) = (uint32_t)((*((uint32_t *)addr)) | (mask));
+        break;
+    case 8:
+        *((uint64_t *)addr) = (uint64_t)((*((uint64_t *)addr)) | (mask));
+        break;
+    }
 }
 
-#define mem_clear(base, offset, size, cmask) { \
-	volatile uint32_t a = (base) + (offset); \
-    switch (size) { \
-    case 1: \
-        *((uint8_t *)a) = (uint8_t)((*((uint8_t *)a) & ~(cmask))); \
-        break; \
-    case 2: \
-        *((uint16_t *)a) = (uint16_t)((*((uint16_t *)a) & ~(cmask))); \
-        break; \
-    case 4: \
-        *((uint32_t *)a) = (uint32_t)((*((uint32_t *)a) & ~(cmask))); \
-        break; \
-    case 8: \
-        *((uint64_t *)a) = (uint64_t)((*((uint64_t *)a) & ~(cmask))); \
-        break; \
-    } \
+static inline void mem_clear(uint32_t base, uint32_t offset, uint32_t size, uint32_t mask)
+{
+    volatile uint32_t addr = base + offset;
+
+    switch (size) {
+        case 1:
+            *((uint8_t *)addr) = (uint8_t)((*((uint8_t *)addr)) & ~(mask));
+            break;
+        case 2:
+            *((uint16_t *)addr) = (uint16_t)((*((uint16_t *)addr)) & ~(mask));
+            break;
+        case 4:
+            *((uint32_t *)addr) = (uint32_t)((*((uint32_t *)addr)) & ~(mask));
+            break;
+        case 8:
+            *((uint64_t *)addr) = (uint64_t)((*((uint64_t *)addr)) & ~(mask));
+            break;
+    }
 }
 
-#define mem_modify(base, offset, size, cmask, smask) { \
-	volatile uint32_t a = (base) + (offset); \
-    switch (size) { \
-    case 1: \
-        *((uint8_t *)a) = (uint8_t)((*((uint8_t *)a) & ~(cmask)) | (smask)); \
-        break; \
-    case 2: \
-        *((uint16_t *)a) = (uint16_t)((*((uint16_t *)a) & ~(cmask)) | (smask)); \
-        break; \
-    case 4: \
-        *((uint32_t *)a) = (uint32_t)((*((uint32_t *)a) & ~(cmask)) | (smask)); \
-        break; \
-    case 8: \
-        *((uint64_t *)a) = (uint64_t)((*((uint64_t *)a) & ~(cmask)) | (smask)); \
-        break; \
-    } \
+static inline void mem_modify(uint32_t base, uint32_t offset, uint32_t size, uint32_t cmask, uint32_t smask)
+{
+    volatile uint32_t addr = base + offset;
+    switch (size) {
+    case 1:
+        *((uint8_t *)addr) = (uint8_t)((*((uint8_t *)addr) & ~(cmask)) | (smask));
+        break;
+    case 2:
+        *((uint16_t *)addr) = (uint16_t)((*((uint16_t *)addr) & ~(cmask)) | (smask));
+        break;
+    case 4:
+        *((uint32_t *)addr) = (uint32_t)((*((uint32_t *)addr) & ~(cmask)) | (smask));
+        break;
+    case 8:
+        *((uint64_t *)addr) = (uint64_t)((*((uint64_t *)addr) & ~(cmask)) | (smask));
+        break;
+    }
+}
 
 #ifdef __cplusplus
 	} /* extern C */

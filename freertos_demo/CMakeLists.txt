@@ -1,7 +1,7 @@
 MESSAGE("ENTER ${CMAKE_CURRENT_SOURCE_DIR}")
 
 # override linker flags
-SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -lgcc -nostdlib -L${CMAKE_CURRENT_SOURCE_DIR} -Xlinker -T${CMAKE_CURRENT_SOURCE_DIR}/elf_ia32_efi.lds -Xlinker --gc-sections -Xlinker -Map=symbols.map")
+SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -lc -lm -nostartfiles -L${CMAKE_CURRENT_SOURCE_DIR} -T${CMAKE_CURRENT_SOURCE_DIR}/elf_ia32_efi.lds -Wl,--gc-sections -Wl,-Map=symbols.map")
 
 # override executable
 SET(EXECUTABLE "FREERTOS_DEMO")
@@ -26,7 +26,7 @@ ADD_EXECUTABLE (${EXECUTABLE}.${ELF_EXTENSION} ${SRC})
 
 ADD_DEPENDENCIES(${EXECUTABLE}.${ELF_EXTENSION} target common)
 
-TARGET_LINK_LIBRARIES(${EXECUTABLE}.${ELF_EXTENSION} target common)
+TARGET_LINK_LIBRARIES(${EXECUTABLE}.${ELF_EXTENSION} target common c)
 
 # include size command
 INCLUDE("${PROJECT_SOURCE_DIR}/cmake/size.cmake")

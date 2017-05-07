@@ -83,9 +83,9 @@ static uint32_t bGalileoGPIOInitialized = FALSE;
  {
 	 // Keep reserved bits [31:8]
 	 if (UseMask)
-		 return *((volatile uint32_t *) (uintn_t)(IohGpioBase + Offset)) & 0xFFFFFF00;
+		 return *((volatile uint32_t *) (uint32_t)(IohGpioBase + Offset)) & 0xFFFFFF00;
 	 else
-		 return *((volatile uint32_t *) (uintn_t)(IohGpioBase + Offset));
+		 return *((volatile uint32_t *) (uint32_t)(IohGpioBase + Offset));
  }
  /*-----------------------------------------------------------*/
 
@@ -94,7 +94,7 @@ static uint32_t bGalileoGPIOInitialized = FALSE;
 	 uint32_t Data32 = uiGalileoGPIORead(Offset, true);
      if (Offset !=  GPIO_INTSTATUS)
     	 Data32 |= (WriteData32 & 0x000FFFFF);
-     *((volatile uint32_t *) (uintn_t)(IohGpioBase + Offset)) = Data32;
+     *((volatile uint32_t *) (uint32_t)(IohGpioBase + Offset)) = Data32;
  }
  /*-----------------------------------------------------------*/
 
@@ -357,13 +357,13 @@ static uint32_t bGalileoGPIOInitialized = FALSE;
   }
   /*-----------------------------------------------------------*/
 
-  static uintn_t GetI2CIoPortBaseAddress(void)
+  static uint32_t GetI2CIoPortBaseAddress(void)
   {
 	  uint8_t Bus = IOH_I2C_GPIO_BUS_NUMBER;
 	  uint8_t Device = IOH_I2C_GPIO_DEVICE_NUMBER;
 	  int8_t Func = IOH_I2C_GPIO_FUNCTION_NUMBER;
 	  uint32_t I2C_controller_base = MMIO_PCI_ADDRESS(Bus, Device, Func, 0);
-	  uintn_t I2CIoPortBaseAddress = mem_read(I2C_controller_base, R_IOH_I2C_MEMBAR, 4);
+	  uint32_t I2CIoPortBaseAddress = mem_read(I2C_controller_base, R_IOH_I2C_MEMBAR, 4);
 	  return I2CIoPortBaseAddress;
   }
   /*-----------------------------------------------------------*/
@@ -381,7 +381,7 @@ static uint32_t bGalileoGPIOInitialized = FALSE;
 
   static void DisableI2CController(void)
   {
-	  uintn_t       I2CIoPortBaseAddress;
+	  uint32_t       I2CIoPortBaseAddress;
 	  uint32_t      Addr;
 	  uint32_t      Data;
 	  uint8_t       PollCount = 0;
@@ -391,21 +391,21 @@ static uint32_t bGalileoGPIOInitialized = FALSE;
 
 	  // Disable the I2C Controller by setting IC_ENABLE.ENABLE to zero
 	  Addr = I2CIoPortBaseAddress + I2C_REG_ENABLE;
-	  Data = *((volatile uint32_t *) (uintn_t)(Addr));
+	  Data = *((volatile uint32_t *) (uint32_t)(Addr));
 	  Data &= ~B_I2C_REG_ENABLE;
-	  *((volatile uint32_t *) (uintn_t)(Addr)) = Data;
+	  *((volatile uint32_t *) (uint32_t)(Addr)) = Data;
 
 	  // Read the IC_ENABLE_STATUS.IC_EN Bit to check if Controller is disabled
 	  Data = 0xFF;
 	  Addr = I2CIoPortBaseAddress + I2C_REG_ENABLE_STATUS;
-	  Data = *((volatile uint32_t *) (uintn_t)(Addr)) & I2C_REG_ENABLE_STATUS;
+	  Data = *((volatile uint32_t *) (uint32_t)(Addr)) & I2C_REG_ENABLE_STATUS;
 	  while (Data != 0)
 	  {
 		  // Poll the IC_ENABLE_STATUS.IC_EN Bit to check if Controller is disabled, until timeout (TI2C_POLL*MAX_T_POLL_COUNT).
 		  if (++PollCount >= MAX_T_POLL_COUNT)
 			  break;
 		  vMicroSecondDelay(TI2C_POLL);
-		  Data = *((volatile uint32_t *) (uintn_t)(Addr));
+		  Data = *((volatile uint32_t *) (uint32_t)(Addr));
 		  Data &= I2C_REG_ENABLE_STATUS;
 	  }
 
@@ -414,14 +414,14 @@ static uint32_t bGalileoGPIOInitialized = FALSE;
 	  if (PollCount < MAX_T_POLL_COUNT)
 	  {
 		  Addr = I2CIoPortBaseAddress + I2C_REG_CLR_INT;
-		  Data = *((volatile uint32_t *) (uintn_t)(Addr));
+		  Data = *((volatile uint32_t *) (uint32_t)(Addr));
 	  }
   }
   /*-----------------------------------------------------------*/
 
   static void EnableI2CController(void)
   {
-	  uintn_t   I2CIoPortBaseAddress;
+	  uint32_t   I2CIoPortBaseAddress;
 	  uint32_t  Addr;
 	  uint32_t  Data;
 
@@ -430,24 +430,24 @@ static uint32_t bGalileoGPIOInitialized = FALSE;
 
 	  // Enable the I2C Controller by setting IC_ENABLE.ENABLE to 1
 	  Addr = I2CIoPortBaseAddress + I2C_REG_ENABLE;
-	  Data = *((volatile uint32_t *) (uintn_t)(Addr));
+	  Data = *((volatile uint32_t *) (uint32_t)(Addr));
 	  Data |= B_I2C_REG_ENABLE;
-	  *((volatile uint32_t *) (uintn_t)(Addr)) = Data;
+	  *((volatile uint32_t *) (uint32_t)(Addr)) = Data;
 
 	  // Clear overflow and abort error status bits before transactions.
 	  Addr = I2CIoPortBaseAddress + I2C_REG_CLR_RX_OVER;
-	  Data = *((volatile uint32_t *) (uintn_t)(Addr));
+	  Data = *((volatile uint32_t *) (uint32_t)(Addr));
 	  Addr = I2CIoPortBaseAddress + I2C_REG_CLR_TX_OVER;
-	  Data = *((volatile uint32_t *) (uintn_t)(Addr));
+	  Data = *((volatile uint32_t *) (uint32_t)(Addr));
 	  Addr = I2CIoPortBaseAddress + I2C_REG_CLR_TX_ABRT;
-	  Data = *((volatile uint32_t *) (uintn_t)(Addr));
+	  Data = *((volatile uint32_t *) (uint32_t)(Addr));
   }
   /*-----------------------------------------------------------*/
 
   static uint32_t InitializeInternal(I2C_ADDR_MODE AddrMode)
   {
-		uintn_t   I2CIoPortBaseAddress;
-		uintn_t   Addr;
+		uint32_t   I2CIoPortBaseAddress;
+		uint32_t   Addr;
 		uint32_t  Data;
 		uint32_t  Status = 0;
 
@@ -462,20 +462,20 @@ static uint32_t bGalileoGPIOInitialized = FALSE;
 
 		// Clear START_DET
 		Addr = I2CIoPortBaseAddress + I2C_REG_CLR_START_DET;
-		Data = *((volatile uint32_t *) (uintn_t)(Addr));
+		Data = *((volatile uint32_t *) (uint32_t)(Addr));
 		Data &= ~B_I2C_REG_CLR_START_DET;
-		*((volatile uint32_t *) (uintn_t)(Addr)) = Data;
+		*((volatile uint32_t *) (uint32_t)(Addr)) = Data;
 
 		// Clear STOP_DET
 		Addr = I2CIoPortBaseAddress + I2C_REG_CLR_STOP_DET;
-		Data = *((volatile uint32_t *) (uintn_t)(Addr));
+		Data = *((volatile uint32_t *) (uint32_t)(Addr));
 		Data &= ~B_I2C_REG_CLR_STOP_DET;
-		*((volatile uint32_t *) (uintn_t)(Addr)) = Data;
+		*((volatile uint32_t *) (uint32_t)(Addr)) = Data;
 
 		// Set addressing mode to user defined (7 or 10 bit) and
 		// speed mode to that defined by PCD (standard mode default).
 		Addr = I2CIoPortBaseAddress + I2C_REG_CON;
-		Data = *((volatile uint32_t *) (uintn_t)(Addr));
+		Data = *((volatile uint32_t *) (uint32_t)(Addr));
 
 		// Set Addressing Mode
 		if (AddrMode == EfiI2CSevenBitAddrMode)
@@ -488,8 +488,8 @@ static uint32_t bGalileoGPIOInitialized = FALSE;
 
 		// Default to slow mode
 		Data |= BIT(1);
-		*((volatile uint32_t *) (uintn_t)(Addr)) = Data;
-		Data = *((volatile uint32_t *) (uintn_t)(Addr));
+		*((volatile uint32_t *) (uint32_t)(Addr)) = Data;
+		Data = *((volatile uint32_t *) (uint32_t)(Addr));
 		return Status;
   }
   /*-----------------------------------------------------------*/
@@ -528,7 +528,7 @@ static uint32_t bGalileoGPIOInitialized = FALSE;
 
   static uint32_t WaitForStopDet(void)
   {
-		uintn_t   I2CIoPortBaseAddress;
+		uint32_t   I2CIoPortBaseAddress;
 		uint32_t  Addr;
 		uint32_t  Data;
 		uint32_t  PollCount = 0;
@@ -541,7 +541,7 @@ static uint32_t bGalileoGPIOInitialized = FALSE;
 		Addr = I2CIoPortBaseAddress + I2C_REG_RAW_INTR_STAT;
 		do
 		{
-			Data = *((volatile uint32_t *) (uintn_t)(Addr));
+			Data = *((volatile uint32_t *) (uint32_t)(Addr));
 			if ((Data & I2C_REG_RAW_INTR_STAT_TX_ABRT) != 0)
 			{
 				Status = -1;
@@ -575,11 +575,11 @@ static uint32_t bGalileoGPIOInitialized = FALSE;
   }
   /*-----------------------------------------------------------*/
 
-  uint32_t WriteMultipleByte(uintn_t I2CAddress, uint8_t *WriteBuffer, uintn_t Length)
+  uint32_t WriteMultipleByte(uint32_t I2CAddress, uint8_t *WriteBuffer, uint32_t Length)
   {
-		uintn_t   I2CIoPortBaseAddress;
-		uintn_t   Index;
-		uintn_t   Addr;
+		uint32_t   I2CIoPortBaseAddress;
+		uint32_t   Index;
+		uint32_t   Addr;
 		uint32_t  Data;
 		uint32_t  Status = 0;
 
@@ -590,10 +590,10 @@ static uint32_t bGalileoGPIOInitialized = FALSE;
 
 		// Write to the IC_TAR register the address of the slave device to be addressed
 		Addr = I2CIoPortBaseAddress + I2C_REG_TAR;
-		Data = *((volatile uint32_t *) (uintn_t)(Addr));
+		Data = *((volatile uint32_t *) (uint32_t)(Addr));
 		Data &= ~B_I2C_REG_TAR;
 		Data |= I2CAddress;
-		*((volatile uint32_t *) (uintn_t)(Addr)) = Data;
+		*((volatile uint32_t *) (uint32_t)(Addr)) = Data;
 
 		// Enable the I2C Controller
 		EnableI2CController ();
@@ -603,13 +603,13 @@ static uint32_t bGalileoGPIOInitialized = FALSE;
 		Addr = I2CIoPortBaseAddress + I2C_REG_DATA_CMD;
 		for (Index = 0; Index < Length; Index++)
 		{
-			  Data = *((volatile uint32_t *) (uintn_t)(Addr));
+			  Data = *((volatile uint32_t *) (uint32_t)(Addr));
 			  Data &= 0xFFFFFF00;
 			  Data |= (uint8_t)WriteBuffer[Index];
 			  Data &= ~B_I2C_REG_DATA_CMD_RW;
 			  if (Index == (Length-1))
 				  Data |= B_I2C_REG_DATA_CMD_STOP;
-			  *((volatile uint32_t *) (uintn_t)(Addr)) = Data;
+			  *((volatile uint32_t *) (uint32_t)(Addr)) = Data;
 		}
 
 		// Wait for transfer completion
@@ -623,9 +623,9 @@ static uint32_t bGalileoGPIOInitialized = FALSE;
   /*-----------------------------------------------------------*/
 
  static void I2CWriteMultipleBytes(I2C_DEVICE_ADDRESS  SlaveAddress,
- I2C_ADDR_MODE AddrMode, uintn_t *Length, void *Buffer)
+ I2C_ADDR_MODE AddrMode, uint32_t *Length, void *Buffer)
  {
-	  uintn_t  I2CAddress;
+	  uint32_t  I2CAddress;
 	  uint16_t SaveCmd;
 	  uint32_t SaveBar0;
 
@@ -644,12 +644,12 @@ static uint32_t bGalileoGPIOInitialized = FALSE;
  }
  /*-----------------------------------------------------------*/
 
-  uint32_t ReadMultipleByte(uintn_t I2CAddress, uint8_t *Buffer,
-  uintn_t WriteLength, uintn_t ReadLength)
+  uint32_t ReadMultipleByte(uint32_t I2CAddress, uint8_t *Buffer,
+  uint32_t WriteLength, uint32_t ReadLength)
   {
-	  uintn_t   I2CIoPortBaseAddress;
-	  uintn_t   Index;
-	  uintn_t   Addr;
+	  uint32_t   I2CIoPortBaseAddress;
+	  uint32_t   Index;
+	  uint32_t   Addr;
 	  uint32_t  Data;
 	  uint8_t   PollCount;
 	  uint32_t  Status;
@@ -661,10 +661,10 @@ static uint32_t bGalileoGPIOInitialized = FALSE;
 
 	  // Write to the IC_TAR register the address of the slave device to be addressed
 	  Addr = I2CIoPortBaseAddress + I2C_REG_TAR;
-	  Data = *((volatile uint32_t *) (uintn_t)(Addr));
+	  Data = *((volatile uint32_t *) (uint32_t)(Addr));
 	  Data &= ~B_I2C_REG_TAR;
 	  Data |= I2CAddress;
-	  *((volatile uint32_t *) (uintn_t)(Addr)) = Data;
+	  *((volatile uint32_t *) (uint32_t)(Addr)) = Data;
 
 	  // Enable the I2C Controller
 	  EnableI2CController ();
@@ -673,22 +673,22 @@ static uint32_t bGalileoGPIOInitialized = FALSE;
 	  Addr = I2CIoPortBaseAddress + I2C_REG_DATA_CMD;
 	  for (Index = 0; Index < WriteLength; Index++)
 	  {
-		  Data = *((volatile uint32_t *) (uintn_t)(Addr));
+		  Data = *((volatile uint32_t *) (uint32_t)(Addr));
       	  Data &= 0xFFFFFF00;
       	  Data |= (uint8_t)Buffer[Index];
       	  Data &= ~B_I2C_REG_DATA_CMD_RW;
-      	  *((volatile uint32_t *) (uintn_t)(Addr)) = Data;
+      	  *((volatile uint32_t *) (uint32_t)(Addr)) = Data;
 	  }
 
 	  // Issue Read Transfers for each byte (Restart issued when write/read bit changed).
 	  for (Index = 0; Index < ReadLength; Index++)
 	  {
-		  Data = *((volatile uint32_t *) (uintn_t)(Addr));
+		  Data = *((volatile uint32_t *) (uint32_t)(Addr));
 		  Data |= B_I2C_REG_DATA_CMD_RW;
 		  // Issue a STOP for last read transfer.
 		  if (Index == (ReadLength-1))
 			  Data |= B_I2C_REG_DATA_CMD_STOP;
-		  *((volatile uint32_t *) (uintn_t)(Addr)) = Data;
+		  *((volatile uint32_t *) (uint32_t)(Addr)) = Data;
 	  }
 
 	  // Wait for STOP condition.
@@ -699,16 +699,16 @@ static uint32_t bGalileoGPIOInitialized = FALSE;
 		  Data = 0;
 		  PollCount = 0;
 		  Addr = I2CIoPortBaseAddress + I2C_REG_RXFLR;
-		  Data = *((volatile uint32_t *) (uintn_t)(Addr));
+		  Data = *((volatile uint32_t *) (uint32_t)(Addr));
 		  while ((Data != ReadLength) && (PollCount < MAX_T_POLL_COUNT))
 		  {
 			  vMicroSecondDelay(TI2C_POLL);
 			  PollCount++;
-			  Data = *((volatile uint32_t *) (uintn_t)(Addr));
+			  Data = *((volatile uint32_t *) (uint32_t)(Addr));
 		  }
 
 		  Addr = I2CIoPortBaseAddress + I2C_REG_RAW_INTR_STAT;
-		  Data = *((volatile uint32_t *) (uintn_t)(Addr));
+		  Data = *((volatile uint32_t *) (uint32_t)(Addr));
 
 		  // If no timeout or device error then read rx data.
 		  if (PollCount == MAX_T_POLL_COUNT)
@@ -723,18 +723,18 @@ static uint32_t bGalileoGPIOInitialized = FALSE;
 		  {
 			  // Clear RX underflow before reading IC_DATA_CMD.
 			  Addr = I2CIoPortBaseAddress + I2C_REG_CLR_RX_UNDER;
-			  Data = *((volatile uint32_t *) (uintn_t)(Addr));
+			  Data = *((volatile uint32_t *) (uint32_t)(Addr));
 
 			  // Read data.
 			  Addr = I2CIoPortBaseAddress + I2C_REG_DATA_CMD;
 			  for (Index = 0; Index < ReadLength; Index++)
 			  {
-				  Data = *((volatile uint32_t *) (uintn_t)(Addr));
+				  Data = *((volatile uint32_t *) (uint32_t)(Addr));
 				  Data &= 0x000000FF;
 				  *(Buffer+Index) = (uint8_t)Data;
 			  }
 			  Addr = I2CIoPortBaseAddress + I2C_REG_RAW_INTR_STAT;
-			  Data = *((volatile uint32_t *) (uintn_t)(Addr));
+			  Data = *((volatile uint32_t *) (uint32_t)(Addr));
 			  Data &= I2C_REG_RAW_INTR_STAT_RX_UNDER;
 			  if (Data != 0)
 			  {
@@ -755,9 +755,9 @@ static uint32_t bGalileoGPIOInitialized = FALSE;
   /*-----------------------------------------------------------*/
 
  static void I2CReadMultipleBytes(I2C_DEVICE_ADDRESS SlaveAddress, I2C_ADDR_MODE AddrMode,
- uintn_t *WriteLength, uintn_t *ReadLength, void *Buffer )
+ uint32_t *WriteLength, uint32_t *ReadLength, void *Buffer )
  {
-	  uintn_t  I2CAddress;
+	  uint32_t  I2CAddress;
 	  uint16_t SaveCmd;
 	  uint32_t SaveBar0;
 
@@ -782,8 +782,8 @@ static uint32_t bGalileoGPIOInitialized = FALSE;
   */
  static void Pcal9555SetPortRegBit(uint32_t Pcal9555SlaveAddr, uint32_t GpioNum, uint8_t RegBase, uint8_t LogicOne)
  {
-	 uintn_t            ReadLength;
-	 uintn_t            WriteLength;
+	 uint32_t            ReadLength;
+	 uint32_t            WriteLength;
 	 uint8_t            Data[2];
 	 uint8_t            *RegValuePtr;
 	 uint8_t            GpioNumMask;
@@ -792,19 +792,19 @@ static uint32_t bGalileoGPIOInitialized = FALSE;
 	 I2C_ADDR_MODE      I2cAddrMode;
 
 	 // Set I2C address and mode.
-	 I2cDeviceAddr.I2CDeviceAddress = (uintn_t) Pcal9555SlaveAddr;
+	 I2cDeviceAddr.I2CDeviceAddress = (uint32_t) Pcal9555SlaveAddr;
 	 I2cAddrMode = EfiI2CSevenBitAddrMode;
 
 	 // Set I2C subaddress and GPIO mask.
 	 if (GpioNum < 8)
 	 {
 		 SubAddr = RegBase;
-		 GpioNumMask = (uintn_t) (1 << GpioNum);
+		 GpioNumMask = (uint32_t) (1 << GpioNum);
 	 }
 	 else
 	 {
 		 SubAddr = RegBase + 1;
-		 GpioNumMask = (uintn_t) (1 << (GpioNum - 8));
+		 GpioNumMask = (uint32_t) (1 << (GpioNum - 8));
 	 }
 
 	 // Output port value always at 2nd byte in Data variable.

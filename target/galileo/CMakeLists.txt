@@ -23,6 +23,7 @@ ADD_SUBDIRECTORY(freertoslib)
 ADD_LIBRARY(${LIB_NAME}
         "startup.S"
         "galileo.c"
+        "syscall.c"
 )
 
 ADD_DEPENDENCIES(${LIB_NAME}

@@ -56,6 +56,8 @@ STRING(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" VERSION_PATCH "${VER
 STRING(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.[0-9]+(.*)" "\\1" VERSION_SHA1 "${VERSION}")
 SET(VERSION_SHORT "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 
+INCLUDE_DIRECTORIES(/Users/eamars/Workspace/i686-elf/i686-elf/include)
+
 # build modules
 ADD_SUBDIRECTORY(target)
 ADD_SUBDIRECTORY(common)

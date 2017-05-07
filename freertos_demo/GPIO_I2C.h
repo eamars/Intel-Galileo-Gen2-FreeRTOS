@@ -204,7 +204,7 @@ GALILEO_GEN2_LEGACY_GPIO_INITIALIZER ,    \
  typedef struct
  {
 	 /// The I2C hardware address to which the I2C device is preassigned or allocated.
-	 uintn_t I2CDeviceAddress : 10;
+	 uint32_t I2CDeviceAddress : 10;
  } I2C_DEVICE_ADDRESS;
 
  typedef enum _I2C_ADDR_MODE

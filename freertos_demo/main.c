@@ -98,6 +98,7 @@
 
 /* Added Galileo serial support. */
 #include "galileo_support.h"
+#include "GPIO_I2C.h"
 
 /* Set to 1 to sit in a loop on start up, allowing a debugger to connect to the
 application before main() executes. */
@@ -247,7 +248,7 @@ const uint32_t ul500ms = 500UL;
 	on line 23. */
 	UngatedMoveToScreenPosition( 23, 2 );
 	printf( ANSI_COLOR_RED );
-	printf( "ASSERT: File = %s, Line = %u\n\r", pcFile, ulLine );
+	printf( "ASSERT: File = %s, Line = %lu\n\r", pcFile, ulLine );
 	printf( ANSI_COLOR_RESET );
 	printf( ANSI_SHOW_CURSOR );
 	vMilliSecondDelay( ul500ms );

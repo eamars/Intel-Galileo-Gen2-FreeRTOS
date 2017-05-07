@@ -25,11 +25,16 @@ ADD_SUBDIRECTORY(drivers)
 # build freertos
 ADD_SUBDIRECTORY(freertoslib)
 
+# include essential driver headers
+INCLUDE_DIRECTORIES(${BOARD_SPECIFIC_INCLUDE_DIRECTORY})
+INCLUDE_DIRECTORIES(${TARGET_SPECIFIC_INCLUDE_DIRECTORY})
+INCLUDE_DIRECTORIES(${FREERTOS_INCLUDE_DIRECTORY})
+
 # build sam4s library
 ADD_LIBRARY(${LIB_NAME}
         "startup.S"
-        "galileo.c"
         "syscall.c"
+        "galileo-support.c"
 )
 
 ADD_DEPENDENCIES(${LIB_NAME}

@@ -32,24 +32,18 @@
  * Any required includes
  *------------------------------------------------------------------------
  */
+#include <string.h>
 #include "multiboot.h"
 #include "galileo_support.h"
+#include "GPIO_I2C.h"
+#include "FreeRTOS.h"
+#include "semphr.h"
 
 /*-----------------------------------------------------------------------
  * Any required local definitions
  *------------------------------------------------------------------------
  */
-#ifndef NULL
-	#define NULL (void *)0
-#endif
-
 #define MUTEX_WAIT_TIME	(( TickType_t ) 8 )
-
-/*-----------------------------------------------------------------------
- * Function prototypes
- *------------------------------------------------------------------------
- */
-extern void *memcpy( void *pvDest, const void *pvSource, unsigned long ulBytes );
 
 /*-----------------------------------------------------------------------
  * Global variables

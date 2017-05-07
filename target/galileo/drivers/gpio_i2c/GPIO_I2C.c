@@ -32,7 +32,7 @@
  * Any required includes
  *------------------------------------------------------------------------
  */
-#include "drivers/gpio_i2c/GPIO_I2C.h"
+#include "GPIO_I2C.h"
 
 /*-----------------------------------------------------------------------
  * Any required local definitions

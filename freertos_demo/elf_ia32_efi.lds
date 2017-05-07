@@ -20,15 +20,18 @@ SECTIONS
 		*( .rodata.*)
 		. = ALIGN(0x4);
 
+        . = ALIGN(4);
         KEEP (*crtbegin.o(.ctors))
         KEEP (*(EXCLUDE_FILE (*crtend.o) .ctors))
         KEEP (*(SORT(.ctors.*)))
         KEEP (*crtend.o(.ctors))
 
+        . = ALIGN(4);
         KEEP (*crtbegin.o(.dtors))
         KEEP (*(EXCLUDE_FILE (*crtend.o) .dtors))
         KEEP (*(SORT(.dtors.*)))
         KEEP (*crtend.o(.dtors))
+
  	    __text_end =  ABSOLUTE(.);
   		. = ALIGN(4096);
 	}

@@ -8,12 +8,9 @@ ADD_LIBRARY(${LIB_NAME}
         "target.c"
 )
 
-# build library for target
-IF (${TARGET} MATCHES "galileo")
-        ADD_SUBDIRECTORY(galileo)
-        ADD_DEPENDENCIES(${LIB_NAME} galileo)
-        TARGET_LINK_LIBRARIES(${LIB_NAME} galileo)
-ENDIF (${TARGET} MATCHES "galileo")
+ADD_SUBDIRECTORY(${TARGET})
+ADD_DEPENDENCIES(${LIB_NAME} ${TARGET})
+TARGET_LINK_LIBRARIES(${LIB_NAME} ${TARGET})
 
 # forwared variables defined in subdirectory
 SET(CMAKE_ASM_FLAGS_DEBUG ${CMAKE_ASM_FLAGS_DEBUG} PARENT_SCOPE)

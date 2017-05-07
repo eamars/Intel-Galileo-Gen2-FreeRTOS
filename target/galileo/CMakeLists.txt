@@ -16,6 +16,12 @@ SET(BOARD_SPECIFIC_INCLUDE_DIRECTORY
         "${CMAKE_CURRENT_SOURCE_DIR}"
 )
 
+# enable drivers to build
+SET(ENABLED_DRIVERS gpio_i2c)
+
+# build drivers
+ADD_SUBDIRECTORY(drivers)
+
 # build freertos
 ADD_SUBDIRECTORY(freertoslib)
 
@@ -27,10 +33,12 @@ ADD_LIBRARY(${LIB_NAME}
 )
 
 ADD_DEPENDENCIES(${LIB_NAME}
+        drivers
         freertoslib
 )
 
 TARGET_LINK_LIBRARIES(${LIB_NAME}
+        drivers
         freertoslib
 )
 

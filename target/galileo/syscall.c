@@ -7,13 +7,6 @@
 
 #include <stddef.h>
 
-#define _close close
-#define _sbrk sbrk
-#define _lseek lseek
-#define _read read
-#define _fstat fstat
-#define _isatty isatty
-
 size_t _read(int fd, char *buffer, size_t size)
 {
 	return 0;

@@ -41,7 +41,7 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 #include "galileo_gen_defs.h"
-#include "GPIO_I2C.h"
+#include "drivers/gpio_i2c/GPIO_I2C.h"
 
 //---------------------------------------------------------------------
 // Application main entry point

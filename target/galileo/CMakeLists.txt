@@ -16,9 +16,6 @@ SET(BOARD_SPECIFIC_INCLUDE_DIRECTORY
         "${CMAKE_CURRENT_SOURCE_DIR}"
 )
 
-# enable drivers to build
-SET(ENABLED_DRIVERS gpio_i2c)
-
 # build drivers
 ADD_SUBDIRECTORY(drivers)
 

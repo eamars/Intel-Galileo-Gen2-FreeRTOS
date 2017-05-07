@@ -10,6 +10,9 @@ INCLUDE_DIRECTORIES("${BOARD_SPECIFIC_INCLUDE_DIRECTORY}")
 # include target specific directory
 INCLUDE_DIRECTORIES("${TARGET_SPECIFIC_INCLUDE_DIRECTORY}")
 
+# enable drivers to build
+SET(ENABLED_DRIVERS gpio_i2c hpet)
+
 # build modules
 FOREACH(MODULE ${ENABLED_DRIVERS})
     # update include list

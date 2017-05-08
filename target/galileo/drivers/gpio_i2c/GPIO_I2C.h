@@ -73,8 +73,11 @@
 #define PCI_REG_INTLINE         0x3c    // Interrupt Line Register
 #define PCI_REG_BRIDGE_CNTL     0x3e    // Bridge Control Register
 
-#define IO_PCI_ADDRESS(bus, dev, fn, reg) \
-(0x80000000 | (bus << 16) | (dev << 11) | (fn << 8) | (reg & ~3))
+
+static inline uint32_t IO_PCI_ADDRESS(uint32_t bus, uint32_t dev, uint32_t fn, uint32_t reg)
+{
+	return (0x80000000 | (bus << 16) | (dev << 11) | (fn << 8) | (reg & ~3));
+}
 
 //---------------------------------------------------------------------
 // PCI Read/Write IO Data

@@ -162,7 +162,6 @@ static void prvClearAssertionLine( void );
 instructions. */
 int main( void )
 {
-    printf("Helloworld\r\n");
 	/* Optionally wait for a debugger to connect. */
 	prvLoopToWaitForDebugConnection();
 

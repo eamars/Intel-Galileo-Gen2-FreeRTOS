@@ -127,6 +127,7 @@ uint32_t  ResumeWellNMIEnable;          ///< Value for QNC NC Reg R_QNC_GPIO_RGN
 // GPIO definitions
 //---------------------------------------------------------------------
 #define GALILEO_GEN2_GPIO_CONTROLLER_INITIALIZER  {0x05, 0x05, 0, 0, 0, 0, 0, 0}
+
 #define GALILEO_GEN2_LEGACY_GPIO_INITIALIZER  	  {0x03, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, \
 	                                               0x03, 0x00, 0x3f, 0x1c, 0x02, 0x00, 0x00, \
 	                                               0x00, 0x00, 0x3f, 0x00}

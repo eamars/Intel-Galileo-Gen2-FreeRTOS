@@ -227,7 +227,7 @@
 	.globl	inb
 	inb:	movl	4(%esp), %edx
 	xorl	%eax, %eax	# clr eax
-	inb	%dx, %al
+	inb	    %dx, %al
 	ret
 
 	/* inw */

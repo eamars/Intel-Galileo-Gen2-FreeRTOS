@@ -44,22 +44,16 @@
 #include <stdint.h>
 
 //---------------------------------------------------------------------
-// Printf prototype
-//---------------------------------------------------------------------
-extern int printf( const char *format, ... );
-extern int print( char **out, const char *format, va_list args );
-extern int sprintf(char *out, const char *format, ...);
-
-//---------------------------------------------------------------------
 // Prototypes (assembly language functions in startup.S)
 //---------------------------------------------------------------------
 extern void halt( void );
-extern int32_t inb( int32_t );
-extern int32_t inw( int32_t );
-extern int32_t inl( int32_t );
-extern int32_t outb( int32_t, int32_t );
-extern int32_t outw( int32_t, int32_t );
-extern int32_t outl( int32_t, int32_t) ;
+
+extern uint32_t inb( uint32_t );
+extern uint32_t inw( uint32_t );
+extern uint32_t inl( uint32_t );
+extern uint32_t outb( uint32_t, uint32_t );
+extern uint32_t outw( uint32_t, uint32_t );
+extern uint32_t outl( uint32_t, uint32_t) ;
 
 //---------------------------------------------------------------------
 // GP definitions

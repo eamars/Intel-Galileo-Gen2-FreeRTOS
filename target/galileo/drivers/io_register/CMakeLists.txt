@@ -1,0 +1,15 @@
+MESSAGE("ENTER ${CMAKE_CURRENT_SOURCE_DIR}")
+
+# get module name
+GET_FILENAME_COMPONENT(LIB_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+
+# include current directory
+INCLUDE_DIRECTORIES (${CMAKE_CURRENT_SOURCE_DIR})
+
+# include target specific directory
+INCLUDE_DIRECTORIES(${BOARD_SPECIFIC_INCLUDE_DIRECTORY})
+
+# build
+ADD_LIBRARY(${LIB_NAME}
+        "io_register.c"
+)

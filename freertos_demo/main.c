@@ -99,6 +99,7 @@
 /* Added Galileo serial support. */
 #include "galileo_support.h"
 #include "GPIO_I2C.h"
+#include "legacy_gpio.h"
 
 /* Set to 1 to sit in a loop on start up, allowing a debugger to connect to the
 application before main() executes. */
@@ -180,10 +181,9 @@ static QueueHandle_t xQueue = NULL;
 static void prvQueueSendTask( void *pvParameters )
 {
 	TickType_t xNextWakeTime;
-	const uint32_t ulValueToSend = 100UL;
 
 	/* Remove compiler warning about unused parameter. */
-	( void ) pvParameters;
+	legacy_gpio_t *led = (legacy_gpio_t *) pvParameters;
 
 	/* Initialise xNextWakeTime - this only needs to be done once. */
 	xNextWakeTime = xTaskGetTickCount();
@@ -193,46 +193,35 @@ static void prvQueueSendTask( void *pvParameters )
 		/* Place this task in the blocked state until it is time to run again. */
 		vTaskDelayUntil( &xNextWakeTime, mainQUEUE_SEND_FREQUENCY_MS );
 
+		// read current output value
+		uint32_t output_value = legacy_gpio_read(led);
+
 		/* Send to the queue - causing the queue receive task to unblock and
 		write to the COM port.  0 is used as the block time so the sending
 		operation will not block - it shouldn't need to block as the queue
 		should always be empty at this point in the code. */
-		xQueueSend( xQueue, &ulValueToSend, 0U );
+		xQueueSend( xQueue, &output_value, 0U);
 	}
 }
 /*-----------------------------------------------------------*/
 
 static void prvQueueReceiveTask( void *pvParameters )
 {
-	uint32_t ulReceivedValue, ulLEDStatus;
-	const uint32_t ulExpectedValue = 100UL;
-
-	/* Remove compiler warning about unused parameter. */
-	( void ) pvParameters;
-
-	/* Initial cursor position to skip a line) */
-	g_printf_rcc( 5, 2, DEFAULT_SCREEN_COLOR, "FreeRTOS initialized" );
+	legacy_gpio_t *led = (legacy_gpio_t *) pvParameters;
 
 	for( ;; )
 	{
 		/* Wait until something arrives in the queue - this task will block
 		indefinitely provided INCLUDE_vTaskSuspend is set to 1 in
 		FreeRTOSConfig.h. */
-		xQueueReceive( xQueue, &ulReceivedValue, portMAX_DELAY );
+		uint32_t output_value = 0;
+		xQueueReceive( xQueue, &output_value, portMAX_DELAY );
 
-		/*  To get here something must have been received from the queue, but
-		is it the expected value?  If it is, write a message to the COMP
-		port. */
-		if( ulReceivedValue == ulExpectedValue )
-		{
-			/* Toggle the LED, and also print the LED toggle state to the
-			UART. */
-			ulLEDStatus = ulBlinkLED();
+		/* Print the LED status */
+		g_printf_rcc( 6, 2, DEFAULT_SCREEN_COLOR, "LED State = %s\r\n", output_value ? "ON" : "OFF");
 
-			/* Print the LED status */
-			g_printf_rcc( 6, 2, DEFAULT_SCREEN_COLOR, "LED State = %d\r\n", ( int ) ulLEDStatus );
-			ulReceivedValue = 0U;
-		}
+		// write opposite value
+		legacy_gpio_write(led, !output_value);
 	}
 }
 /*-----------------------------------------------------------*/
@@ -252,6 +241,10 @@ int main( void )
 	/* Create the queue. */
 	xQueue = xQueueCreate( mainQUEUE_LENGTH, sizeof( uint32_t ) );
 
+	// create load led instance
+	legacy_gpio_t load_led;
+	legacy_gpio_init(&load_led, 5, 0, 0);
+
 	if( xQueue != NULL )
 	{
 		/* Start the two tasks as described in the comments at the top of this
@@ -259,11 +252,11 @@ int main( void )
 		xTaskCreate( prvQueueReceiveTask,				/* The function that implements the task. */
 		             "Rx", 								/* The text name assigned to the task - for debug only as it is not used by the kernel. */
 		             configMINIMAL_STACK_SIZE * 2,		/* The size of the stack to allocate to the task. */
-		             NULL, 								/* The parameter passed to the task - not used in this case. */
+		             &load_led, 								/* The parameter passed to the task - not used in this case. */
 		             mainQUEUE_RECEIVE_TASK_PRIORITY, 	/* The priority assigned to the task. */
 		             NULL );								/* The task handle is not required, so NULL is passed. */
 
-		xTaskCreate( prvQueueSendTask, "TX", configMINIMAL_STACK_SIZE * 2, NULL, mainQUEUE_SEND_TASK_PRIORITY, NULL );
+		xTaskCreate( prvQueueSendTask, "TX", configMINIMAL_STACK_SIZE * 2, &load_led, mainQUEUE_SEND_TASK_PRIORITY, NULL );
 
 		/* Start the tasks and timer running. */
 		vTaskStartScheduler();
@@ -419,7 +412,6 @@ static void prvSetupHardware( void )
 {
 	/* Initialise the serial port and GPIO. */
 	vInitializeGalileoSerialPort( DEBUG_SERIAL_PORT );
-	vGalileoInitializeGpioController();
 	vGalileoInitializeLegacyGPIO();
 
 	/* Initialise HPET interrupt(s) */

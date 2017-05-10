@@ -15,7 +15,7 @@
 
 typedef struct
 {
-	uint32_t pin_mask;
+	uint32_t pin;
 } legacy_gpio_t;
 
 #ifdef __cplusplus
@@ -25,7 +25,7 @@ extern "C" {
 void legacy_gpio_init(legacy_gpio_t *obj, uint32_t pin, uint32_t direction, uint32_t value);
 
 uint32_t legacy_gpio_read(legacy_gpio_t *obj);
-void legacy_gpio_write(legacy_gpio_t *obj);
+void legacy_gpio_write(legacy_gpio_t *obj, uint32_t value);
 
 uint32_t legacy_gpio_get_direction(legacy_gpio_t *obj);
 void legacy_gpio_set_direction(legacy_gpio_t *obj, uint32_t direction);

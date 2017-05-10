@@ -65,8 +65,8 @@ static void legacy_gpio_controller_init(void)
 	io_register_write_32(legacy_gpio_base_address + CGTS_OFFSET, 0x03);
 	io_register_write_32(legacy_gpio_base_address + CGTS_OFFSET, 0x00);
 	io_register_write_32(legacy_gpio_base_address + RGEN_OFFSET, 0x3f);
-	io_register_write_32(legacy_gpio_base_address + RGIO_OFFSET, 0x1c);
-	io_register_write_32(legacy_gpio_base_address + RGLVL_OFFSET, 0x02);
+	io_register_write_32(legacy_gpio_base_address + RGIO_OFFSET, 0x3f);
+	io_register_write_32(legacy_gpio_base_address + RGLVL_OFFSET, 0x00);
 	io_register_write_32(legacy_gpio_base_address + RGTPE_OFFSET, 0x00);
 	io_register_write_32(legacy_gpio_base_address + RGTNE_OFFSET, 0x00);
 	io_register_write_32(legacy_gpio_base_address + RGGPE_OFFSET, 0x00);
@@ -97,15 +97,88 @@ void legacy_gpio_init(legacy_gpio_t *obj, uint32_t pin, uint32_t direction, uint
 
 	uint32_t legacy_gpio_base_address = pci_config_addr_read_32(legacy_gpio_base_address_pci_addr) & LEGACY_GPIO_BASE_ADDRESS_MASK;
 
+	// calculate pin mask
+	uint32_t pin_mask = 1UL << pin;
+
 	// store pin
-	obj->pin_mask = BIT(pin);
+	obj->pin = pin;
 
 	// enable pin
-	io_register_modify_32(legacy_gpio_base_address + RGEN_OFFSET, obj->pin_mask, obj->pin_mask);
+	io_register_modify_32(legacy_gpio_base_address + RGEN_OFFSET, pin_mask, pin_mask);
 
 	// set direction
-	io_register_modify_32(legacy_gpio_base_address + RGIO_OFFSET, direction << pin, obj->pin_mask);
+	io_register_modify_32(legacy_gpio_base_address + RGIO_OFFSET, direction << pin, pin_mask);
 
 	// set output value
-	io_register_modify_32(legacy_gpio_base_address + RGLVL_OFFSET, value << pin, obj->pin_mask);
+	// writing to this register will have no effect if the port is configured as input, see Intel Quark X1000 datasheet
+	// section 21.6.5.11
+	io_register_modify_32(legacy_gpio_base_address + RGLVL_OFFSET, value << pin, pin_mask);
+}
+
+uint32_t legacy_gpio_read(legacy_gpio_t *obj)
+{
+	// get GPIO base address
+	const pci_config_addr_t legacy_gpio_base_address_pci_addr =
+			{
+					.bus = LEGACY_GPIO_BASE_BUS,
+					.device = LEGACY_GPIO_BASE_DEVICE,
+					.function = LEGACY_GPIO_BASE_FUNCTION,
+					.offset = LEGACY_GPIO_BASE_OFFSET
+			};
+
+	uint32_t legacy_gpio_base_address = pci_config_addr_read_32(legacy_gpio_base_address_pci_addr) & LEGACY_GPIO_BASE_ADDRESS_MASK;
+
+	uint32_t pin_mask = 1UL << obj->pin;
+	return (io_register_read_32(legacy_gpio_base_address + RGLVL_OFFSET) & pin_mask);
+}
+
+void legacy_gpio_write(legacy_gpio_t *obj, uint32_t value)
+{
+	// get GPIO base address
+	const pci_config_addr_t legacy_gpio_base_address_pci_addr =
+			{
+					.bus = LEGACY_GPIO_BASE_BUS,
+					.device = LEGACY_GPIO_BASE_DEVICE,
+					.function = LEGACY_GPIO_BASE_FUNCTION,
+					.offset = LEGACY_GPIO_BASE_OFFSET
+			};
+
+	uint32_t legacy_gpio_base_address = pci_config_addr_read_32(legacy_gpio_base_address_pci_addr) & LEGACY_GPIO_BASE_ADDRESS_MASK;
+
+	uint32_t pin_mask = 1UL << obj->pin;
+	return io_register_modify_32(legacy_gpio_base_address + RGLVL_OFFSET, value << obj->pin, pin_mask);
+}
+
+uint32_t legacy_gpio_get_direction(legacy_gpio_t *obj)
+{
+	// get GPIO base address
+	const pci_config_addr_t legacy_gpio_base_address_pci_addr =
+			{
+					.bus = LEGACY_GPIO_BASE_BUS,
+					.device = LEGACY_GPIO_BASE_DEVICE,
+					.function = LEGACY_GPIO_BASE_FUNCTION,
+					.offset = LEGACY_GPIO_BASE_OFFSET
+			};
+
+	uint32_t legacy_gpio_base_address = pci_config_addr_read_32(legacy_gpio_base_address_pci_addr) & LEGACY_GPIO_BASE_ADDRESS_MASK;
+
+	uint32_t pin_mask = 1UL << obj->pin;
+	return (io_register_read_32(legacy_gpio_base_address + RGIO_OFFSET) & pin_mask);
+}
+
+void legacy_gpio_set_direction(legacy_gpio_t *obj, uint32_t direction)
+{
+	// get GPIO base address
+	const pci_config_addr_t legacy_gpio_base_address_pci_addr =
+			{
+					.bus = LEGACY_GPIO_BASE_BUS,
+					.device = LEGACY_GPIO_BASE_DEVICE,
+					.function = LEGACY_GPIO_BASE_FUNCTION,
+					.offset = LEGACY_GPIO_BASE_OFFSET
+			};
+
+	uint32_t legacy_gpio_base_address = pci_config_addr_read_32(legacy_gpio_base_address_pci_addr) & LEGACY_GPIO_BASE_ADDRESS_MASK;
+
+	uint32_t pin_mask = 1UL << obj->pin;
+	return io_register_modify_32(legacy_gpio_base_address + RGIO_OFFSET, direction << obj->pin, pin_mask);
 }

@@ -11,7 +11,7 @@ INCLUDE_DIRECTORIES("${BOARD_SPECIFIC_INCLUDE_DIRECTORY}")
 INCLUDE_DIRECTORIES("${TARGET_SPECIFIC_INCLUDE_DIRECTORY}")
 
 # enable drivers to build
-SET(ENABLED_DRIVERS gpio_i2c hpet quark_x1000 pci io_register legacy)
+SET(ENABLED_DRIVERS gpio_i2c hpet quark_x1000 pci io_register legacy gpio)
 
 # build modules
 FOREACH(MODULE ${ENABLED_DRIVERS})

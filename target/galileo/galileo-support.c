@@ -33,6 +33,7 @@
  *------------------------------------------------------------------------
  */
 #include <string.h>
+#include <stdio.h>
 #include "multiboot.h"
 #include "galileo_support.h"
 #include "GPIO_I2C.h"
@@ -85,6 +86,8 @@ static struct sd gdt_default[NGDE] =
 	/* 6th, Data Segment for BIOS32 request */
 	{       0xffff,          0,           0,      0x92,         0xcf,        0, },
 };
+
+extern int print( char **out, const char *format, va_list args );
 
 extern struct sd gdt[];	/* Global segment table (defined in startup.S) */
 

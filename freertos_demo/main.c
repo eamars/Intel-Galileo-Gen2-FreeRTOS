@@ -89,6 +89,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <drivers/pci/pci.h>
 
 /* Scheduler include files. */
 #include "FreeRTOS.h"
@@ -205,6 +206,7 @@ static void prvQueueSendTask( void *pvParameters )
 }
 /*-----------------------------------------------------------*/
 
+extern void gpio_controller_init(void);
 static void prvQueueReceiveTask( void *pvParameters )
 {
 	legacy_gpio_t *led = (legacy_gpio_t *) pvParameters;
@@ -222,6 +224,8 @@ static void prvQueueReceiveTask( void *pvParameters )
 
 		// write opposite value
 		legacy_gpio_write(led, !output_value);
+
+		gpio_controller_init();
 	}
 }
 /*-----------------------------------------------------------*/

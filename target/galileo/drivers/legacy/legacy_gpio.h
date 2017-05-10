@@ -13,10 +13,13 @@
 
 #include <stdint.h>
 
+#define GPIO_SUS(x) (x)
+
 typedef struct
 {
 	uint32_t pin;
 } legacy_gpio_t;
+
 
 #ifdef __cplusplus
 extern "C" {

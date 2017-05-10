@@ -17,7 +17,6 @@
 #define LEGACY_GPIO_BASE_DEVICE             31
 #define LEGACY_GPIO_BASE_FUNCTION           0
 #define LEGACY_GPIO_BASE_OFFSET             0x44
-#define LEGACY_GPIO_BASE_ADDRESS_MASK       0x0000FFC0
 
 // Table 136 specifies definitions of these control registers
 #define CGEN_OFFSET                         0x0
@@ -53,7 +52,7 @@ static void legacy_gpio_controller_init(void)
 					.offset = LEGACY_GPIO_BASE_OFFSET
 			};
 
-	uint32_t legacy_gpio_base_address = pci_config_addr_read_32(legacy_gpio_base_address_pci_addr) & LEGACY_GPIO_BASE_ADDRESS_MASK;
+	uint32_t legacy_gpio_base_address = pci_config_addr_read_32(legacy_gpio_base_address_pci_addr);
 
 	io_register_write_32(legacy_gpio_base_address + CGEN_OFFSET, 0x03);
 	io_register_write_32(legacy_gpio_base_address + CGIO_OFFSET, 0x03);
@@ -95,7 +94,7 @@ void legacy_gpio_init(legacy_gpio_t *obj, uint32_t pin, uint32_t direction, uint
 					.offset = LEGACY_GPIO_BASE_OFFSET
 			};
 
-	uint32_t legacy_gpio_base_address = pci_config_addr_read_32(legacy_gpio_base_address_pci_addr) & LEGACY_GPIO_BASE_ADDRESS_MASK;
+	uint32_t legacy_gpio_base_address = pci_config_addr_read_32(legacy_gpio_base_address_pci_addr);
 
 	// calculate pin mask
 	uint32_t pin_mask = 1UL << pin;
@@ -126,7 +125,7 @@ uint32_t legacy_gpio_read(legacy_gpio_t *obj)
 					.offset = LEGACY_GPIO_BASE_OFFSET
 			};
 
-	uint32_t legacy_gpio_base_address = pci_config_addr_read_32(legacy_gpio_base_address_pci_addr) & LEGACY_GPIO_BASE_ADDRESS_MASK;
+	uint32_t legacy_gpio_base_address = pci_config_addr_read_32(legacy_gpio_base_address_pci_addr);
 
 	uint32_t pin_mask = 1UL << obj->pin;
 	return (io_register_read_32(legacy_gpio_base_address + RGLVL_OFFSET) & pin_mask);
@@ -143,7 +142,7 @@ void legacy_gpio_write(legacy_gpio_t *obj, uint32_t value)
 					.offset = LEGACY_GPIO_BASE_OFFSET
 			};
 
-	uint32_t legacy_gpio_base_address = pci_config_addr_read_32(legacy_gpio_base_address_pci_addr) & LEGACY_GPIO_BASE_ADDRESS_MASK;
+	uint32_t legacy_gpio_base_address = pci_config_addr_read_32(legacy_gpio_base_address_pci_addr);
 
 	uint32_t pin_mask = 1UL << obj->pin;
 	return io_register_modify_32(legacy_gpio_base_address + RGLVL_OFFSET, value << obj->pin, pin_mask);
@@ -160,7 +159,7 @@ uint32_t legacy_gpio_get_direction(legacy_gpio_t *obj)
 					.offset = LEGACY_GPIO_BASE_OFFSET
 			};
 
-	uint32_t legacy_gpio_base_address = pci_config_addr_read_32(legacy_gpio_base_address_pci_addr) & LEGACY_GPIO_BASE_ADDRESS_MASK;
+	uint32_t legacy_gpio_base_address = pci_config_addr_read_32(legacy_gpio_base_address_pci_addr);
 
 	uint32_t pin_mask = 1UL << obj->pin;
 	return (io_register_read_32(legacy_gpio_base_address + RGIO_OFFSET) & pin_mask);
@@ -177,7 +176,7 @@ void legacy_gpio_set_direction(legacy_gpio_t *obj, uint32_t direction)
 					.offset = LEGACY_GPIO_BASE_OFFSET
 			};
 
-	uint32_t legacy_gpio_base_address = pci_config_addr_read_32(legacy_gpio_base_address_pci_addr) & LEGACY_GPIO_BASE_ADDRESS_MASK;
+	uint32_t legacy_gpio_base_address = pci_config_addr_read_32(legacy_gpio_base_address_pci_addr);
 
 	uint32_t pin_mask = 1UL << obj->pin;
 	return io_register_modify_32(legacy_gpio_base_address + RGIO_OFFSET, direction << obj->pin, pin_mask);

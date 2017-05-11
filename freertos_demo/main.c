@@ -101,6 +101,7 @@
 #include "galileo_support.h"
 #include "GPIO_I2C.h"
 #include "legacy_gpio.h"
+#include "gpio.h"
 
 /* Set to 1 to sit in a loop on start up, allowing a debugger to connect to the
 application before main() executes. */
@@ -178,13 +179,12 @@ the queue empty. */
 
 /* The queue used by both tasks. */
 static QueueHandle_t xQueue = NULL;
+legacy_gpio_t legacy_gpio[6];
+gpio_t gpio[10];
 
 static void prvQueueSendTask( void *pvParameters )
 {
 	TickType_t xNextWakeTime;
-
-	/* Remove compiler warning about unused parameter. */
-	legacy_gpio_t *led = (legacy_gpio_t *) pvParameters;
 
 	/* Initialise xNextWakeTime - this only needs to be done once. */
 	xNextWakeTime = xTaskGetTickCount();
@@ -195,7 +195,7 @@ static void prvQueueSendTask( void *pvParameters )
 		vTaskDelayUntil( &xNextWakeTime, mainQUEUE_SEND_FREQUENCY_MS );
 
 		// read current output value
-		uint32_t output_value = legacy_gpio_read(led);
+		uint32_t output_value = legacy_gpio_read(&legacy_gpio[5]);
 
 		/* Send to the queue - causing the queue receive task to unblock and
 		write to the COM port.  0 is used as the block time so the sending
@@ -205,12 +205,8 @@ static void prvQueueSendTask( void *pvParameters )
 	}
 }
 /*-----------------------------------------------------------*/
-
-extern void gpio_controller_init(void);
 static void prvQueueReceiveTask( void *pvParameters )
 {
-	legacy_gpio_t *led = (legacy_gpio_t *) pvParameters;
-
 	for( ;; )
 	{
 		/* Wait until something arrives in the queue - this task will block
@@ -220,17 +216,23 @@ static void prvQueueReceiveTask( void *pvParameters )
 		xQueueReceive( xQueue, &output_value, portMAX_DELAY );
 
 		/* Print the LED status */
-		g_printf_rcc( 6, 2, DEFAULT_SCREEN_COLOR, "LED State = %s\r\n", output_value ? "ON" : "OFF");
+		g_printf_rcc( 6, 2, DEFAULT_SCREEN_COLOR, "LED State = %s\r\n", output_value ? "OFF" : "ON ");
 
 		// write opposite value
-		legacy_gpio_write(led, !output_value);
+		legacy_gpio_write(&legacy_gpio[5], !output_value);
 
-		gpio_controller_init();
+		for (int i = 0; i < 6; i++)
+		{
+			legacy_gpio_write(&legacy_gpio[i], !output_value);
+		}
+
+		for (int i = 0; i < 10; i++)
+		{
+			gpio_write(&gpio[i], !output_value);
+		}
 	}
 }
 /*-----------------------------------------------------------*/
-
-
 
 int main( void )
 {
@@ -246,8 +248,17 @@ int main( void )
 	xQueue = xQueueCreate( mainQUEUE_LENGTH, sizeof( uint32_t ) );
 
 	// create load led instance
-	legacy_gpio_t load_led;
-	legacy_gpio_init(&load_led, 5, 0, 0);
+	for (int i = 0; i < 6; i++)
+	{
+		legacy_gpio_init(&legacy_gpio[i], i, 0, 0);
+	}
+
+	for (int i = 0; i < 10; i++)
+	{
+		gpio_init(&gpio[i], i, 1, 1);
+	}
+
+	vGalileoRouteLEDPins();
 
 	if( xQueue != NULL )
 	{
@@ -256,11 +267,11 @@ int main( void )
 		xTaskCreate( prvQueueReceiveTask,				/* The function that implements the task. */
 		             "Rx", 								/* The text name assigned to the task - for debug only as it is not used by the kernel. */
 		             configMINIMAL_STACK_SIZE * 2,		/* The size of the stack to allocate to the task. */
-		             &load_led, 								/* The parameter passed to the task - not used in this case. */
+		             NULL, 								/* The parameter passed to the task - not used in this case. */
 		             mainQUEUE_RECEIVE_TASK_PRIORITY, 	/* The priority assigned to the task. */
 		             NULL );								/* The task handle is not required, so NULL is passed. */
 
-		xTaskCreate( prvQueueSendTask, "TX", configMINIMAL_STACK_SIZE * 2, &load_led, mainQUEUE_SEND_TASK_PRIORITY, NULL );
+		xTaskCreate( prvQueueSendTask, "TX", configMINIMAL_STACK_SIZE * 2, NULL, mainQUEUE_SEND_TASK_PRIORITY, NULL );
 
 		/* Start the tasks and timer running. */
 		vTaskStartScheduler();
@@ -388,27 +399,7 @@ volatile uint32_t ul = 0;
 
 void vApplicationTickHook( void )
 {
-	#if( mainCREATE_SIMPLE_BLINKY_DEMO_ONLY == 0 )
-	{
-		extern void vTimerPeriodicISRTests( void );
 
-		/* The full demo includes a software timer demo/test that requires
-		prodding periodically from the tick interrupt. */
-		vTimerPeriodicISRTests();
-
-		/* Call the periodic queue overwrite from ISR demo. */
-		vQueueOverwritePeriodicISRDemo();
-
-		/* Call the periodic event group from ISR demo. */
-		vPeriodicEventGroupsProcessing();
-
-		/* Call the periodic queue set from ISR demo. */
-		vQueueSetAccessQueueSetFromISR();
-
-		/* Use task notifications from an interrupt. */
-		xNotifyTaskFromISR();
-	}
-	#endif
 }
 /*-----------------------------------------------------------*/
 
@@ -416,18 +407,6 @@ static void prvSetupHardware( void )
 {
 	/* Initialise the serial port and GPIO. */
 	vInitializeGalileoSerialPort( DEBUG_SERIAL_PORT );
-	vGalileoInitializeLegacyGPIO();
-
-	/* Initialise HPET interrupt(s) */
-	#if( ( mainCREATE_SIMPLE_BLINKY_DEMO_ONLY != 1 ) && ( hpetHPET_TIMER_IN_USE != 0 ) )
-	{
-		portDISABLE_INTERRUPTS();
-		vInitializeAllHPETInterrupts();
-	}
-	#endif
-
-	/* Setup the LED. */
-	vGalileoLegacyGPIOInitializationForLED();
 
 	/* Print RTOS loaded message. */
 	vPrintBanner();

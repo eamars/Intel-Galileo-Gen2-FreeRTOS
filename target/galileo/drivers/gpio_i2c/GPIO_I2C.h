@@ -290,6 +290,7 @@ void vGalileoLegacyGPIOInitializationForLED(void);
 void vGalileoSetGPIOBitDirection(uint32_t GPIONumber, uint32_t Direction);
 void vGalileoSetGPIOBitLevel(uint32_t GPIONumber, uint32_t Level);
 void vGalileoBlinkLEDUsingLegacyGPIO(uint32_t Level);
+void vGalileoRouteLEDPins(void);
 
 #ifdef __cplusplus
 	} /* extern C */

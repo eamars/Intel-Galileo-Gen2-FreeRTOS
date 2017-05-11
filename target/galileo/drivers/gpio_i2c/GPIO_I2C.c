@@ -41,11 +41,6 @@
 #ifndef NULL
 	#define NULL (void *)0
 #endif
-/*-----------------------------------------------------------------------
- * Function prototypes
- *------------------------------------------------------------------------
- */
-static void vGalileoRouteLEDPins(void);
 
 /*-----------------------------------------------------------------------
  * Static variables
@@ -852,7 +847,7 @@ static uint32_t bGalileoGPIOInitialized = FALSE;
   * GPIO pin routing function
   *------------------------------------------------------------------------
   */
- static void vGalileoRouteLEDPins(void)
+void vGalileoRouteLEDPins(void)
  {
 	 // For GpioNums below values 0 to 7 are for Port0 IE. P0-0 - P0-7 and
 	 // values 8 to 15 are for Port1 IE. P1-0 - P1-7.

@@ -1,0 +1,23 @@
+MESSAGE("ENTER ${CMAKE_CURRENT_SOURCE_DIR}")
+
+# get module name
+GET_FILENAME_COMPONENT(LIB_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+
+# include current directory
+INCLUDE_DIRECTORIES (${CMAKE_CURRENT_SOURCE_DIR})
+
+# include target specific directory
+INCLUDE_DIRECTORIES(${BOARD_SPECIFIC_INCLUDE_DIRECTORY})
+
+INCLUDE_DIRECTORIES(
+        "${TARGET_ROOT_DIRECTORY}/drivers/pci"
+        "${TARGET_ROOT_DIRECTORY}/drivers/io_register"
+)
+
+# build
+ADD_LIBRARY(${LIB_NAME}
+        "i2c.c"
+)
+
+ADD_DEPENDENCIES(${LIB_NAME} pci io_register)
+TARGET_LINK_LIBRARIES(${LIB_NAME} pci io_register)

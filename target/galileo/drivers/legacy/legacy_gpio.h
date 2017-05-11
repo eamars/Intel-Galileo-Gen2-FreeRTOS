@@ -5,7 +5,7 @@
  * @date May, 2017
  *
  * The GPIO base address (GBA) is defined in section 21.3.6 in Intel Quark X1000 datasheet
- * Definitions for Legacy GPIO components can be found in section 21.6
+ * Definitions for Legacy GPIO couintmponents can be found in section 21.6
  */
 
 #ifndef LEGACY_GPIO_H_

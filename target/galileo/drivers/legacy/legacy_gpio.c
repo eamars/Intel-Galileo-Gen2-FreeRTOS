@@ -54,23 +54,23 @@ static void legacy_gpio_controller_init(void)
 
 	uint32_t legacy_gpio_base_address = pci_config_addr_read_32(legacy_gpio_base_address_pci_addr);
 
-	io_register_write_32(legacy_gpio_base_address + CGEN_OFFSET, 0x03);
-	io_register_write_32(legacy_gpio_base_address + CGIO_OFFSET, 0x03);
+	io_register_write_32(legacy_gpio_base_address + CGEN_OFFSET, 0x3);
+	io_register_write_32(legacy_gpio_base_address + CGIO_OFFSET, 0x3);
 	io_register_write_32(legacy_gpio_base_address + CGLVL_OFFSET, 0x00);
 	io_register_write_32(legacy_gpio_base_address + CGTPE_OFFSET, 0x00);
 	io_register_write_32(legacy_gpio_base_address + CGTNE_OFFSET, 0x00);
 	io_register_write_32(legacy_gpio_base_address + CGGPE_OFFSET, 0x00);
 	io_register_write_32(legacy_gpio_base_address + CGSMI_OFFSET, 0x00);
-	io_register_write_32(legacy_gpio_base_address + CGTS_OFFSET, 0x03);
 	io_register_write_32(legacy_gpio_base_address + CGTS_OFFSET, 0x00);
-	io_register_write_32(legacy_gpio_base_address + RGEN_OFFSET, 0x3f);
-	io_register_write_32(legacy_gpio_base_address + RGIO_OFFSET, 0x3f);
+	io_register_write_32(legacy_gpio_base_address + CGTS_OFFSET, 0x00);
+	io_register_write_32(legacy_gpio_base_address + RGEN_OFFSET, 0x3F);
+	io_register_write_32(legacy_gpio_base_address + RGIO_OFFSET, 0x3F);
 	io_register_write_32(legacy_gpio_base_address + RGLVL_OFFSET, 0x00);
 	io_register_write_32(legacy_gpio_base_address + RGTPE_OFFSET, 0x00);
 	io_register_write_32(legacy_gpio_base_address + RGTNE_OFFSET, 0x00);
 	io_register_write_32(legacy_gpio_base_address + RGGPE_OFFSET, 0x00);
 	io_register_write_32(legacy_gpio_base_address + RGSMI_OFFSET, 0x00);
-	io_register_write_32(legacy_gpio_base_address + RGTS_OFFSET, 0x3f);
+	io_register_write_32(legacy_gpio_base_address + RGTS_OFFSET, 0x00);
 	io_register_write_32(legacy_gpio_base_address + CGNMIEN_OFFSET, 0x00);
 	io_register_write_32(legacy_gpio_base_address + RGNMIEN_OFFSET, 0x00);
 }
@@ -128,6 +128,7 @@ uint32_t legacy_gpio_read(legacy_gpio_t *obj)
 	uint32_t legacy_gpio_base_address = pci_config_addr_read_32(legacy_gpio_base_address_pci_addr);
 
 	uint32_t pin_mask = 1UL << obj->pin;
+
 	return (io_register_read_32(legacy_gpio_base_address + RGLVL_OFFSET) & pin_mask);
 }
 
@@ -145,7 +146,8 @@ void legacy_gpio_write(legacy_gpio_t *obj, uint32_t value)
 	uint32_t legacy_gpio_base_address = pci_config_addr_read_32(legacy_gpio_base_address_pci_addr);
 
 	uint32_t pin_mask = 1UL << obj->pin;
-	return io_register_modify_32(legacy_gpio_base_address + RGLVL_OFFSET, value << obj->pin, pin_mask);
+
+	io_register_modify_32(legacy_gpio_base_address + RGLVL_OFFSET, value << obj->pin, pin_mask);
 }
 
 uint32_t legacy_gpio_get_direction(legacy_gpio_t *obj)
@@ -162,6 +164,7 @@ uint32_t legacy_gpio_get_direction(legacy_gpio_t *obj)
 	uint32_t legacy_gpio_base_address = pci_config_addr_read_32(legacy_gpio_base_address_pci_addr);
 
 	uint32_t pin_mask = 1UL << obj->pin;
+
 	return (io_register_read_32(legacy_gpio_base_address + RGIO_OFFSET) & pin_mask);
 }
 
@@ -179,5 +182,6 @@ void legacy_gpio_set_direction(legacy_gpio_t *obj, uint32_t direction)
 	uint32_t legacy_gpio_base_address = pci_config_addr_read_32(legacy_gpio_base_address_pci_addr);
 
 	uint32_t pin_mask = 1UL << obj->pin;
+
 	return io_register_modify_32(legacy_gpio_base_address + RGIO_OFFSET, direction << obj->pin, pin_mask);
 }

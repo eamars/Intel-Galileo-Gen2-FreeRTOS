@@ -11,7 +11,8 @@ INCLUDE_DIRECTORIES(${BOARD_SPECIFIC_INCLUDE_DIRECTORY})
 
 INCLUDE_DIRECTORIES(
         "${TARGET_ROOT_DIRECTORY}/drivers/pci"
-        "${TARGET_ROOT_DIRECTORY}/drivers/io_register"
+        "${TARGET_ROOT_DIRECTORY}/drivers/mm_register"
+        "${TARGET_ROOT_DIRECTORY}/drivers/quark_x1000"
 )
 
 # build
@@ -19,5 +20,5 @@ ADD_LIBRARY(${LIB_NAME}
         "i2c.c"
 )
 
-ADD_DEPENDENCIES(${LIB_NAME} pci io_register)
-TARGET_LINK_LIBRARIES(${LIB_NAME} pci io_register)
+ADD_DEPENDENCIES(${LIB_NAME} pci mm_register)
+TARGET_LINK_LIBRARIES(${LIB_NAME} pci mm_register)

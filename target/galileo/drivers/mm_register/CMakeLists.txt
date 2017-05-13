@@ -9,15 +9,7 @@ INCLUDE_DIRECTORIES (${CMAKE_CURRENT_SOURCE_DIR})
 # include target specific directory
 INCLUDE_DIRECTORIES(${BOARD_SPECIFIC_INCLUDE_DIRECTORY})
 
-INCLUDE_DIRECTORIES(
-        "${TARGET_ROOT_DIRECTORY}/drivers/pci"
-        "${TARGET_ROOT_DIRECTORY}/drivers/mm_register"
-)
-
 # build
 ADD_LIBRARY(${LIB_NAME}
-        "gpio.c"
+        "mm_register.c"
 )
-
-ADD_DEPENDENCIES(${LIB_NAME} pci mm_register)
-TARGET_LINK_LIBRARIES(${LIB_NAME} pci mm_register)

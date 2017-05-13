@@ -8,7 +8,7 @@
 #include <stdbool.h>
 #include "gpio.h"
 #include "pci.h"
-#include "io_register.h"
+#include "mm_register.h"
 #include "galileo_support.h"
 
 #define PCI_CONFIG_BASE_BUS         0
@@ -50,18 +50,18 @@ void gpio_controller_init(void)
 
 	uint32_t bar1_base_address = pci_config_addr_read_32(bar1_base_address_pci_addr);
 
-	io_register_write_32(bar1_base_address + GPIO_SWPORTA_DR_OFFSET, 0x0);
-	io_register_write_32(bar1_base_address + GPIO_SWPORTA_DDR_OFFSET, 0x0);
-	io_register_write_32(bar1_base_address + GPIO_INTEN_OFFSET, 0x0);
-	io_register_write_32(bar1_base_address + GPIO_INTMASK_OFFSET, 0x0);
-	io_register_write_32(bar1_base_address + GPIO_INTTYPE_LEVEL_OFFSET, 0x0);
-	io_register_write_32(bar1_base_address + GPIO_INT_POLARITY_OFFSET, 0x0);
-	io_register_write_32(bar1_base_address + GPIO_INTSTATUS_OFFSET, 0x0);
-	io_register_write_32(bar1_base_address + GPIO_RAW_INTSTATUS_OFFSET, 0x0);
-	io_register_write_32(bar1_base_address + GPIO_DEBOUNCE_OFFSET, 0x0);
-	io_register_write_32(bar1_base_address + GPIO_PORTA_EOI_OFFSET, 0x0);
-	io_register_write_32(bar1_base_address + GPIO_EXT_PORTA_OFFSET, 0x0);
-	io_register_write_32(bar1_base_address + GPIO_LS_SYNC_OFFSET, 0x0);
+	mm_register_write_32(bar1_base_address + GPIO_SWPORTA_DR_OFFSET, 0x0);
+	mm_register_write_32(bar1_base_address + GPIO_SWPORTA_DDR_OFFSET, 0x0);
+	mm_register_write_32(bar1_base_address + GPIO_INTEN_OFFSET, 0x0);
+	mm_register_write_32(bar1_base_address + GPIO_INTMASK_OFFSET, 0x0);
+	mm_register_write_32(bar1_base_address + GPIO_INTTYPE_LEVEL_OFFSET, 0x0);
+	mm_register_write_32(bar1_base_address + GPIO_INT_POLARITY_OFFSET, 0x0);
+	mm_register_write_32(bar1_base_address + GPIO_INTSTATUS_OFFSET, 0x0);
+	mm_register_write_32(bar1_base_address + GPIO_RAW_INTSTATUS_OFFSET, 0x0);
+	mm_register_write_32(bar1_base_address + GPIO_DEBOUNCE_OFFSET, 0x0);
+	mm_register_write_32(bar1_base_address + GPIO_PORTA_EOI_OFFSET, 0x0);
+	mm_register_write_32(bar1_base_address + GPIO_EXT_PORTA_OFFSET, 0x0);
+	mm_register_write_32(bar1_base_address + GPIO_LS_SYNC_OFFSET, 0x0);
 }
 
 void gpio_init(gpio_t *obj, uint32_t pin, uint32_t direction, uint32_t value)
@@ -91,10 +91,10 @@ void gpio_init(gpio_t *obj, uint32_t pin, uint32_t direction, uint32_t value)
 	obj->pin = pin;
 
 	// set direction
-	io_register_modify_32(bar1_base_address + GPIO_SWPORTA_DDR_OFFSET, direction << pin, pin_mask);
+	mm_register_modify_32(bar1_base_address + GPIO_SWPORTA_DDR_OFFSET, direction << pin, pin_mask);
 
 	// set output value
-	io_register_modify_32(bar1_base_address + GPIO_SWPORTA_DR_OFFSET, value << pin, pin_mask);
+	mm_register_modify_32(bar1_base_address + GPIO_SWPORTA_DR_OFFSET, value << pin, pin_mask);
 }
 
 
@@ -113,7 +113,7 @@ uint32_t gpio_read(gpio_t *obj)
 
 	uint32_t pin_mask = 1UL << obj->pin;
 
-	return (io_register_read_32(bar1_base_address + GPIO_SWPORTA_DR_OFFSET) & pin_mask);
+	return (mm_register_read_32(bar1_base_address + GPIO_SWPORTA_DR_OFFSET) & pin_mask);
 }
 
 void gpio_write(gpio_t *obj, uint32_t value)
@@ -131,7 +131,7 @@ void gpio_write(gpio_t *obj, uint32_t value)
 
 	uint32_t pin_mask = 1UL << obj->pin;
 
-	io_register_modify_32(bar1_base_address + GPIO_SWPORTA_DR_OFFSET, value << obj->pin, pin_mask);
+	mm_register_modify_32(bar1_base_address + GPIO_SWPORTA_DR_OFFSET, value << obj->pin, pin_mask);
 }
 
 uint32_t gpio_get_direction(gpio_t *obj)
@@ -149,7 +149,7 @@ uint32_t gpio_get_direction(gpio_t *obj)
 
 	uint32_t pin_mask = 1UL << obj->pin;
 
-	return (io_register_read_32(bar1_base_address + GPIO_SWPORTA_DDR_OFFSET) & pin_mask);
+	return (mm_register_read_32(bar1_base_address + GPIO_SWPORTA_DDR_OFFSET) & pin_mask);
 }
 
 void gpio_set_direction(gpio_t *obj, uint32_t value)
@@ -167,5 +167,5 @@ void gpio_set_direction(gpio_t *obj, uint32_t value)
 
 	uint32_t pin_mask = 1UL << obj->pin;
 
-	io_register_modify_32(bar1_base_address + GPIO_SWPORTA_DDR_OFFSET, value << obj->pin, pin_mask);
+	mm_register_modify_32(bar1_base_address + GPIO_SWPORTA_DDR_OFFSET, value << obj->pin, pin_mask);
 }

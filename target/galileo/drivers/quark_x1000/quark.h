@@ -8,7 +8,12 @@
 #ifndef QUARK_X1000_H_
 #define QUARK_X1000_H_
 
-#include "device_id.h"
+#include <stdint.h>
+
+static inline uint32_t bit_modify(uint32_t target, uint32_t value, uint32_t mask)
+{
+	return (target & ~mask) | (value & mask);
+}
 
 
 #endif /* QUARK_X1000_H_ */

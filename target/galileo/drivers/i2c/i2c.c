@@ -44,7 +44,7 @@
 #define IC_CLR_STOP_DET_OFFSET      0x60
 #define IC_CLR_START_DET_OFFSET     0x64
 #define IC_ENABLE_OFFSET            0x6C
-#define IC_STATS_OFFSET             0x70
+#define IC_STATUS_OFFSET             0x70
 #define IC_TXFLR_OFFSET             0x74
 #define IC_RXFLR_OFFSET             0x78
 #define IC_SDA_HOLD_OFFSET          0x7C
@@ -64,7 +64,7 @@ static inline i2c_error_t i2c_controller_disable(uint32_t bar0_base_address)
 {
 	mm_register_modify_32(bar0_base_address + IC_ENABLE_OFFSET, 0x0, 0x1);
 
-	for (uint32_t poll_count = 0; poll_count < MAX_T_POLL_COUNT, poll_count++)
+	for (uint32_t poll_count = 0; poll_count < MAX_T_POLL_COUNT; poll_count++)
 	{
 		// read from enable status
 		uint32_t ic_en = mm_register_read_32(bar0_base_address + IC_ENABLE_STATUS_OFFSET) & 0x1;
@@ -214,9 +214,7 @@ int32_t i2c_read(i2c_t *obj, i2c_address_t address, uint8_t *data, size_t length
 	// enable i2c controller
 	i2c_controller_enable(bar0_base_address);
 
-	// write a "read" command to the slave
-
-	// initialize a read command
+	// transfer a read command
 	uint32_t ic_data_cmd = mm_register_read_32(bar0_base_address + IC_DATA_CMD_OFFSET);
 
 	// write data
@@ -228,17 +226,45 @@ int32_t i2c_read(i2c_t *obj, i2c_address_t address, uint8_t *data, size_t length
 	// write to register
 	mm_register_write_32(bar0_base_address + IC_DATA_CMD_OFFSET, ic_data_cmd);
 
-	// "read" command transmit complete
-
-	// start receiving process
-
 	// count number of bytes actually transmitted
 	int32_t actual_length = 0;
 
 	for (size_t i = 0; i < length; i++, data++)
 	{
-		// TODO: poll from fifo
+		// wait for FIFO is ready before reading from registers
+		uint32_t poll_count = 0;
+		while (1)
+		{
+			uint32_t ic_rfne = mm_register_read_32(bar0_base_address + IC_STATUS_OFFSET) & (1 << 4);
+
+			// fifo is not empty
+			if (ic_rfne)
+			{
+				break;
+			}
+			else
+			{
+				// either data is not ready or expect to receive nothing
+				// if exceeded maximum tries
+				if (poll_count == MAX_T_POLL_COUNT)
+				{
+					return I2C_TIMEOUT;
+				}
+				else
+				{
+					vMicroSecondDelay(TI2C_POLL);
+					poll_count += 1;
+				}
+			}
+		}
+
+		// read from fifo
+		ic_data_cmd = mm_register_read_32(bar0_base_address + IC_DATA_CMD_OFFSET);
+
+		// TODO: whether to write back to register
 	}
+
+	return actual_length;
 }
 
 int32_t i2c_write(i2c_t *obj, i2c_address_t address, const uint8_t *data, size_t length, bool stop)
@@ -280,6 +306,33 @@ int32_t i2c_write(i2c_t *obj, i2c_address_t address, const uint8_t *data, size_t
 		if (i == length - 1)
 		{
 			ic_data_cmd = bit_modify(ic_data_cmd, ((uint32_t) stop) << 9, 1 << 9);
+		}
+
+		// wait for FIFO is ready before writing to register
+		uint32_t poll_count = 0;
+		while (1)
+		{
+			// read from TFNS register in IC_STATUS register
+			uint32_t ic_tfnf = mm_register_read_32(bar0_base_address + IC_STATUS_OFFSET) & (1 << 1);
+
+			// fifo is not full
+			if (ic_tfnf)
+			{
+				break;
+			}
+			else
+			{
+				// if exceeded maximum tries
+				if (poll_count == MAX_T_POLL_COUNT)
+				{
+					return I2C_TIMEOUT;
+				}
+				else
+				{
+					vMicroSecondDelay(TI2C_POLL);
+					poll_count += 1;
+				}
+			}
 		}
 
 		// write to register

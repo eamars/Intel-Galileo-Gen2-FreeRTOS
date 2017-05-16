@@ -102,10 +102,11 @@
 #include "GPIO_I2C.h"
 #include "legacy_gpio.h"
 #include "gpio.h"
+#include "i2c.h"
 
 /* Set to 1 to sit in a loop on start up, allowing a debugger to connect to the
 application before main() executes. */
-#define mainWAIT_FOR_DEBUG_CONNECTION 		0
+#define mainWAIT_FOR_DEBUG_CONNECTION 		1
 
 /* Set mainCREATE_SIMPLE_BLINKY_DEMO_ONLY to one to run the simple blinky demo,
 or 0 to run the more comprehensive test and demo application. */
@@ -140,7 +141,6 @@ void vApplicationTickHook( void );
  * Perform any hardware/peripheral related initialisation necessary to run the
  * demo.
  */
-static void prvSetupHardware( void );
 static void prvCalibrateLVTimer( void );
 
 /*
@@ -179,8 +179,11 @@ the queue empty. */
 
 /* The queue used by both tasks. */
 static QueueHandle_t xQueue = NULL;
+i2c_t i2c;
 legacy_gpio_t legacy_gpio[6];
 gpio_t gpio[10];
+
+static uint32_t task_exec_counter[3] = {0, 0, 0};
 
 static void prvQueueSendTask( void *pvParameters )
 {
@@ -202,6 +205,8 @@ static void prvQueueSendTask( void *pvParameters )
 		operation will not block - it shouldn't need to block as the queue
 		should always be empty at this point in the code. */
 		xQueueSend( xQueue, &output_value, 0U);
+
+		task_exec_counter[0] += 1;
 	}
 }
 /*-----------------------------------------------------------*/
@@ -230,6 +235,8 @@ static void prvQueueReceiveTask( void *pvParameters )
 		{
 			gpio_write(&gpio[i], !output_value);
 		}
+
+		task_exec_counter[1] += 1;
 	}
 }
 /*-----------------------------------------------------------*/
@@ -239,8 +246,13 @@ int main( void )
 	/* Optionally wait for a debugger to connect. */
 	prvLoopToWaitForDebugConnection();
 
-	/* Init the UART, GPIO, etc. */
-	prvSetupHardware();
+	/* Initialise the serial port and GPIO. */
+	vInitializeGalileoSerialPort( DEBUG_SERIAL_PORT );
+
+	/* Print RTOS loaded message. */
+	vPrintBanner();
+
+	vGalileoRouteLEDPins();
 
 	g_printf_rcc( 3, 2, DEFAULT_SCREEN_COLOR, "Running main_blinky()." );
 
@@ -326,19 +338,7 @@ void vApplicationStackOverflowHook( TaskHandle_t pxTask, char *pcTaskName )
 
 void vApplicationIdleHook( void )
 {
-	volatile unsigned long xFreeHeapSpace;
-
-	/* This is just a trivial example of an idle hook.  It is called on each
-	cycle of the idle task.  It must *NOT* attempt to block.  In this case the
-	idle task just queries the amount of FreeRTOS heap that remains.  See the
-	memory management section on the http://www.FreeRTOS.org web site for memory
-	management options.  If there is a lot of heap memory free then the
-	configTOTAL_HEAP_SIZE value in FreeRTOSConfig.h can be reduced to free up
-	RAM. */
-	xFreeHeapSpace = xPortGetFreeHeapSize();
-
-	/* Remove compiler warning about xFreeHeapSpace being set but never used. */
-	( void ) xFreeHeapSpace;
+	task_exec_counter[2] += 1;
 }
 /*-----------------------------------------------------------*/
 
@@ -400,16 +400,6 @@ volatile uint32_t ul = 0;
 void vApplicationTickHook( void )
 {
 
-}
-/*-----------------------------------------------------------*/
-
-static void prvSetupHardware( void )
-{
-	/* Initialise the serial port and GPIO. */
-	vInitializeGalileoSerialPort( DEBUG_SERIAL_PORT );
-
-	/* Print RTOS loaded message. */
-	vPrintBanner();
 }
 /*-----------------------------------------------------------*/
 
